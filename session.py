@@ -1,29 +1,30 @@
 class Session:
     def __init__(self, curr_user):
         self.user = curr_user
-        self.loadBookings()
-        self.loadSpaces()
+        self.allBookings = self.loadBookings()
+        self.allSpaces = self.loadSpaces()
     
-    def loadBookings():
+    def loadBookings(self):
         pass
 
-    def loadSpaces():
+    def loadSpaces(self):
         pass
 
-    def saveBookings():
+    def saveBookings(self):
         pass
     
-    def saveSpaces():
+    def saveSpaces(self):
         pass
     
-    def viewBookings():
+    def viewBookings(self):
+        
         pass
     
-    def cancelBooking():
+    def cancelBooking(self):
         pass
     
-    def addSpace():
+    def addSpace(self):
         pass
     
-    def removeSpace():
+    def removeSpace(self):
         pass
