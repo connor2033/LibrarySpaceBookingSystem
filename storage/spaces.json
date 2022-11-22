@@ -6,7 +6,7 @@
             "seats": 4,
             "outlets": true,
             "accessible": true,
-            "queit": false,
+            "quiet": false,
             "private": true,
             "media": true
         }
@@ -18,7 +18,7 @@
             "seats": 1,
             "outlets": true,
             "accessible": true,
-            "queit": true,
+            "quiet": true,
             "private": false,
             "media": false
         }
@@ -30,7 +30,7 @@
             "seats": 6,
             "outlets": true,
             "accessible": true,
-            "queit": false,
+            "quiet": false,
             "private": true,
             "media": true
         }
@@ -42,7 +42,7 @@
             "seats": 4,
             "outlets": false,
             "accessible": false,
-            "queit": false,
+            "quiet": false,
             "private": true,
             "media": true
         }
