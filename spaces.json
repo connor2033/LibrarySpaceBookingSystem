@@ -1,0 +1,50 @@
+[
+    {
+        "spaceId": 0,
+        "location": "Taylor - Room 155",
+        "filters": {
+            "seats": 4,
+            "outlets": true,
+            "accessible": true,
+            "queit": false,
+            "private": true,
+            "media": true
+        }
+    },
+    {
+        "spaceId": 1,
+        "location": "Taylor - Floor G",
+        "filters": {
+            "seats": 1,
+            "outlets": true,
+            "accessible": true,
+            "queit": true,
+            "private": false,
+            "media": false
+        }
+    },
+    {
+        "spaceId": 2,
+        "location": "Weldon - Room 17",
+        "filters": {
+            "seats": 6,
+            "outlets": true,
+            "accessible": true,
+            "queit": false,
+            "private": true,
+            "media": true
+        }
+    },
+    {
+        "spaceId": 3,
+        "location": "Weldon - Room 20",
+        "filters": {
+            "seats": 4,
+            "outlets": false,
+            "accessible": false,
+            "queit": false,
+            "private": true,
+            "media": true
+        }
+    }
+]

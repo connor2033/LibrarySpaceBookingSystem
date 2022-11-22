@@ -1,0 +1,23 @@
+[
+    {
+        "bookingId": 0,
+        "spaceId": 2,
+        "userEmail": "cdong49@uwo.ca",
+        "startTime": "2022-11-21T14:00:00.000Z",
+        "endTime": "2022-11-21T16:00:00.000Z"
+    },
+    {
+        "bookingId": 1,
+        "spaceId": 0,
+        "userEmail": "eliu72@uwo.ca",
+        "startTime": "2022-11-21T11:00:00.000Z",
+        "endTime": "2022-11-21T13:00:00.000Z"
+    },
+    {
+        "bookingId": 3,
+        "spaceId": 2,
+        "userEmail": "hmukhta@uwo.ca",
+        "startTime": "2022-11-24T15:00:00.000Z",
+        "endTime": "2022-11-24T17:00:00.000Z"
+    }
+]
