@@ -40,7 +40,7 @@ class Session:
         f = open('storage/spaces.json')
         data = json.load(f)
 
-        spaces = []
+        spaces = {}
         for space in data:
             newSpace = Space(
                 spacesId = space['spaceId'],
@@ -64,7 +64,7 @@ class Session:
         Iterate through all the bookings and find the user's bookings
         """
         userBookings = []
-        for booking in self.allBookings:
+        for booking in self.allBookings.values():
             if booking.userId == self.user.userId:
                 userBookings.append(booking)
         return userBookings
@@ -79,7 +79,7 @@ class Session:
         """
         Iterate through user bookings and remove the specified booking
         """
-        for booking in self.userBookings:
+        for booking in self.userBookings.values():
             if booking.bookingId == bookingId:
                 self.userBookings.remove(booking)
                 return
