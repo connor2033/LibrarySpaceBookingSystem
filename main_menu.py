@@ -1,12 +1,9 @@
 from booking import Booking
 from space import Space
 from user import User
+from session import Session
+
 import datetime
-
-user = None
-bookings = []
-spaces = []
-
 
 def main():
     print("Hello world!")
@@ -20,19 +17,6 @@ def login():
     return
 
 def logout():
-
-    return
-
-def loadJSON():
-
-    return
-
-def saveJSON():
-
-    return
-
-def viewSpaces():
-
     return
 
 def bookSpace():
@@ -45,23 +29,11 @@ def bookSpace():
 
     return
 
-def viewBookings():
-
-    return
-
-def cancelBooking():
-
-    return
-
-def addSpace():
-    newSpace = Space(123, 4, "filters", "Taylor Library 155")
-    spaces.append(newSpace)
-    print("Space added")
-    return
-
-def removeSpace():
-
-    return
+# def addSpace():
+#     newSpace = Space(123, 4, "filters", "Taylor Library 155")
+#     spaces.append(newSpace)
+#     print("Space added")
+#     return
 
 if __name__ == '__main__':
     main()
