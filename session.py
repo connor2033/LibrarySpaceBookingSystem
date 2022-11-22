@@ -1,6 +1,10 @@
 import json
 from datetime import datetime
 
+from booking import Booking
+from space import Space
+from user import User
+
 class Session:
     def __init__(self, curr_user):
         self.user = curr_user
