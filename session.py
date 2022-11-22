@@ -13,10 +13,13 @@ class Session:
         self.userBookings = self.getUserBookings()
     
     def loadBookings(self):
+        """
+        Read bookings.json file and loads the data into a dictionary (key, value) = (id, Booking obj)
+        """
         f = open('storage/bookings.json')
         data = json.load(f)
 
-        bookings = []
+        bookings = {}
         for booking in data:
             newBooking = Booking(
                 bookingId = booking['bookingId'],
@@ -25,12 +28,15 @@ class Session:
                 start = datetime.strptime(booking['startTime'], '%Y-%m-%d %H:%M'),
                 end = datetime.strptime(booking['endTime'], '%Y-%m-%d %H:%M')
             )
-            bookings.append(newBooking)
+            bookings[booking['bookingId']] = newBooking
         
         f.close()
         return bookings
 
     def loadSpaces(self):
+        """
+        Read spaces.json file and loads the data into a dictionary (key, value) = (id, Space obj)
+        """
         f = open('storage/spaces.json')
         data = json.load(f)
 
@@ -42,7 +48,8 @@ class Session:
                 filters = space['filters'],
                 location = space['location']
             )
-            spaces.append(newSpace)
+            spaces[space['spaceId']] = newSpace
+
         f.close()
         return spaces
 
