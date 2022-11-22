@@ -1,9 +1,4 @@
 class Space:
-    
-    spaceId = 0
-    seats = 0
-    filters = {}
-    location = ""
 
     def __init__(self, spaceId, seats, filters, location):
         self.spaceId = spaceId
