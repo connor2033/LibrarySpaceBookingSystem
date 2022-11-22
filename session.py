@@ -84,8 +84,27 @@ class Session:
                 self.userBookings.remove(booking)
                 return
     
-    def addSpace(self):
-        pass
+    def addSpace(self, spaceId, location, seats, outlets, accessible, quiet, private, media):
+        
+        nextSpace = max(self.allSpaces.keys()) + 1
+
+        filters = {
+            "outlets": outlets,
+            "accesible": accessible,
+            "quiet": quiet,
+            "private":private,
+            "media":media
+
+        }
+        newSpace = Space(
+                spacesId = self.allSpaces[nextSpace],
+                seats = self.allSpaces[seats],
+                filters = self.allSpaces[filters],
+                location = self.allSpaces[location]
+            )
+        
+        self.allSpaces[nextSpace] = newSpace
+        
     
-    def removeSpace(self):
-        pass
+    def removeSpace(self, spaceId):
+        del self.allSpaces[spaceId]
