@@ -7,16 +7,24 @@ from rich.console import Console
 from rich import print
 from rich.panel import Panel
 from rich.table import Table
+from getpass import getpass
+import re
 import sys
+
+console = Console()
 
 def main():
     # title panel + login
-    console = Console()
+    
     format = "blink bold white"
     print(Panel("Library Space Management System", style=format))
-    console.print("\nHello! Please login.", style=format)
-    console.print(
-        "You are now a verified user. What would you like to do?\n", style=format)
+
+    login(format)
+    # console.print("\nHello! Please login.", style=format)
+    # userEmail = input("Email: ")
+    # userPassword = getpass("Password: ")
+
+    console.print("\nYou are now a verified user. What would you like to do?\n", style=format)
 
     # table with options
     table = Table(title="Select from the following options:")
@@ -34,18 +42,35 @@ def main():
     while not (option == "0"):
         option = input()
         if option == "0":
+            print("Logout ")
             sys.exit()
         elif option == "1":
-            print("View bookings")
+            print("Check available spaces")
         elif option == "2":
-            print("View bookings")
+            print("View my bookings")
         elif option == "3":
-            print("View bookings")
+            print("Add a study space")
         elif option == "4":
-            print("View bookings")
+            print("Remove a study space")
 
-def login():
-    user = User("chaines4@uwo.ca", isLibrarian=False)
+def login(format):
+    console.print("\nHello! Please login.", style=format)
+
+    emailHost = ""
+    regexMatch = False
+    emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+    while emailHost != "@uwo.ca" or regexMatch == False:
+        userEmail = input("Email: ")
+        emailHost = userEmail[-7:]
+        regexMatch = re.fullmatch(emailRegex, userEmail)
+        if emailHost != "@uwo.ca" or regexMatch == False:
+            console.print("Please enter a valid UWO email address.", style=format)
+
+
+    userPassword = getpass("Password: ")
+
+    # user = User("chaines4@uwo.ca", isLibrarian=False)
     return
 
 if __name__ == '__main__':
