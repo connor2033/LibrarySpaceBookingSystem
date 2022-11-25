@@ -43,7 +43,7 @@ class Session:
         spaces = {}
         for space in data:
             newSpace = Space(
-                spacesId = space['spaceId'],
+                spaceId = space['spaceId'],
                 seats = space['seats'],
                 filters = space['filters'],
                 location = space['location']
@@ -52,6 +52,24 @@ class Session:
 
         f.close()
         return spaces
+    
+    # def loadUsers(self):
+    #     """
+    #     Read users.json file and validate the user credentials
+    #     """
+    #     f = open('storage/users.json')
+    #     data = json.load(f)
+
+    #     users = {}
+    #     for user in data:
+    #         newUser = User(
+    #             userId = user['email'],
+    #             isLibrarian = user['isLibrarian']
+    #         )
+    #         users[user['email']] = newUser
+
+    #     f.close()
+    #     return users
 
     def saveBookings(self):
         pass
@@ -97,7 +115,7 @@ class Session:
 
         }
         newSpace = Space(
-                spacesId = self.allSpaces[nextSpace],
+                spaceId = self.allSpaces[nextSpace],
                 seats = self.allSpaces[seats],
                 filters = self.allSpaces[filters],
                 location = self.allSpaces[location]
