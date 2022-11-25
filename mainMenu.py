@@ -10,8 +10,10 @@ from rich.table import Table
 from getpass import getpass
 import re
 import sys
+import json
 
 console = Console()
+session = None
 
 def main():
     # title panel + login
@@ -19,10 +21,9 @@ def main():
     format = "blink bold white"
     print(Panel("Library Space Management System", style=format))
 
-    login(format)
-    # console.print("\nHello! Please login.", style=format)
-    # userEmail = input("Email: ")
-    # userPassword = getpass("Password: ")
+    global session
+    session = login(format)
+    console.print("Welcome "+session.user.userId, style=format)
 
     console.print("\nYou are now a verified user. What would you like to do?\n", style=format)
 
@@ -54,24 +55,50 @@ def main():
             print("Remove a study space")
 
 def login(format):
+
     console.print("\nHello! Please login.", style=format)
-
-    emailHost = ""
-    regexMatch = False
     emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    valid = False
 
-    while emailHost != "@uwo.ca" or regexMatch == False:
+    while valid == False:
+
+        # Get Email
         userEmail = input("Email: ")
-        emailHost = userEmail[-7:]
-        regexMatch = re.fullmatch(emailRegex, userEmail)
-        if emailHost != "@uwo.ca" or regexMatch == False:
+        if userEmail[-7:] != "@uwo.ca" or not re.fullmatch(emailRegex, userEmail):
             console.print("Please enter a valid UWO email address.", style=format)
+            continue
+        
+        # Get password
+        userPassword = getpass("Password: ")
+        validCredentials, user = validateUser(userEmail, userPassword)
 
+        if not validCredentials:
+            console.print("Invalid Username or Password.", style=format)
+            continue
+        else:
+            valid = True
+            newSession = Session(user)
+    
+    return newSession
 
-    userPassword = getpass("Password: ")
+def validateUser(email, password):
+    """
+    Read users.json file and validate the user credentials
+    """
+    f = open('storage/users.json')
+    data = json.load(f)
 
-    # user = User("chaines4@uwo.ca", isLibrarian=False)
-    return
+    valid = False
+    user = None
+    for userRecord in data:
+        if userRecord['email'] == email and userRecord['password'] == password:
+            valid = True
+            user = User(userRecord['email'], userRecord['isLibrarian'])
+            break
+
+    f.close()
+    return valid, user
+
 
 if __name__ == '__main__':
     main()
