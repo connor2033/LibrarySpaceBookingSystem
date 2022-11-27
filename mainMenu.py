@@ -7,6 +7,8 @@ from rich.console import Console
 from rich import print
 from rich.panel import Panel
 from rich.table import Table
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+import time
 from getpass import getpass
 import re
 import sys
@@ -43,15 +45,22 @@ def main():
     while not (option == "0"):
         option = input()
         if option == "0":
-            print("Logout ")
+            console.clear()
+            print("Goodbye, "+session.user.firstName)
+            print("Logging out.")
             sys.exit()
         elif option == "1":
+            console.clear()
             print("Check available spaces")
         elif option == "2":
+            console.clear()
             print("View my bookings")
-        elif option == "3":
+            # Option to cancel booking here
+        elif option == "3" and session.user.isLibrarian:
+            console.clear()
             print("Add a study space")
-        elif option == "4":
+        elif option == "4" and session.user.isLibrarian:
+            console.clear()
             print("Remove a study space")
 
 def login(format):
@@ -65,7 +74,8 @@ def login(format):
         # Get Email
         userEmail = input("Email: ")
         if userEmail[-7:] != "@uwo.ca" or not re.fullmatch(emailRegex, userEmail):
-            console.print("Please enter a valid UWO email address.", style=format)
+            console.clear()
+            console.print("[red]Please enter a valid UWO email address.", style=format)
             continue
         
         # Get password
@@ -73,11 +83,18 @@ def login(format):
         validCredentials, user = validateUser(userEmail, userPassword)
 
         if not validCredentials:
-            console.print("Invalid Username or Password.", style=format)
+            console.clear()
+            console.print("[red]Invalid Username or Password.", style=format)
             continue
         else:
             valid = True
             newSession = Session(user)
+    
+    console.clear()
+    if newSession.user.isLibrarian:
+        console.print("[green]Welcome, "+newSession.user.firstName+". You have librarian level permissions.", style=format)
+    else:
+        console.print("[green]Welcome, "+newSession.user.firstName+". You have signed in as a student.", style=format)
     
     return newSession
 
@@ -97,6 +114,14 @@ def validateUser(email, password):
             break
 
     f.close()
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), BarColumn()) as progress:
+
+        task1 = progress.add_task("[blue]Checking Credentials", total=100)
+
+        while not progress.finished:
+            progress.update(task1, advance=1)
+            time.sleep(0.005)
+    
     return valid, user
 
 
