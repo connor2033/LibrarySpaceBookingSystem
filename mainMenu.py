@@ -23,7 +23,10 @@ def main():
 
     global session
     session = login(format)
-    console.print("Welcome "+session.user.userId, style=format)
+    if session.user.isLibrarian:
+        console.print("Welcome, "+session.user.firstName+". You have librarian level permissions.", style=format)
+    else:
+        console.print("Welcome, "+session.user.firstName+". You have signed in as a student.", style=format)
 
     console.print("\nYou are now a verified user. What would you like to do?\n", style=format)
 
@@ -33,8 +36,9 @@ def main():
     table.add_column("Action", style="magenta")
     table.add_row("1","Check available spaces")
     table.add_row("2","View my bookings")
-    table.add_row("3","Add a study space")
-    table.add_row("4","Remove a study space")
+    if session.user.isLibrarian:
+        table.add_row("3","Add a study space")
+        table.add_row("4","Remove a study space")
     table.add_row("0","Logout")
     console.print(table)
 
@@ -49,9 +53,10 @@ def main():
             print("Check available spaces")
         elif option == "2":
             print("View my bookings")
-        elif option == "3":
+            # Option to cancel booking here
+        elif option == "3" and session.user.isLibrarian:
             print("Add a study space")
-        elif option == "4":
+        elif option == "4" and session.user.isLibrarian:
             print("Remove a study space")
 
 def login(format):
@@ -93,7 +98,7 @@ def validateUser(email, password):
     for userRecord in data:
         if userRecord['email'] == email and userRecord['password'] == password:
             valid = True
-            user = User(userRecord['email'], userRecord['isLibrarian'])
+            user = User(userRecord['email'], userRecord['isLibrarian'], userRecord['firstName'], userRecord['lastName'])
             break
 
     f.close()
