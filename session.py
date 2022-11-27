@@ -128,11 +128,9 @@ class Session:
         for booking in self.allBookings.values():
             bookingsPerDay[booking.start.date()].append(booking)
 
-        # show weekly availabilities
+        # show weekly availabilities - display one table per day
         for day in bookingsPerDay:
-            # table with options
-            table = Table(title="Space Availabilities for " + day.strftime("%B %d, %Y"), show_lines=True)
-            # load existing bookings
+            table = Table(title="Space Availabilities for " + day.strftime("%B %d, %Y"), show_lines=True) # create a table to display space availabilities
             table.add_column("Table", justify="right", style="cyan", no_wrap=True)
 
             # create 12 columns for times between 9am - 9pm (library open hours)
