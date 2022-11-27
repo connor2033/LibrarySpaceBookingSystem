@@ -8,4 +8,12 @@ class Booking:
         self.userId = userId
         self.start = start
         self.end = end
-   
+
+    def toDict(self):
+        return {
+            "bookingId": self.bookingId,
+            "spaceId": self.spaceId,
+            "userEmail": self.userId,
+            "startTime": str(self.start),
+            "endTime": str(self.end)
+        }
