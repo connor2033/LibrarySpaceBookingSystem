@@ -2,21 +2,29 @@
   {
     "email": "chaines4@uwo.ca",
     "password": "pwd",
-    "isLibrarian": true
+    "isLibrarian": true,
+    "firstName": "Connor",
+    "lastName": "Haines"
   },
   {
     "email": "cdong49@uwo.ca",
     "password": "12345",
-    "isLibrarian": false
+    "isLibrarian": false,
+    "firstName": "Calvin",
+    "lastName": "Dong"
   },
   {
     "email": "eliu72@uwo.ca",
     "password": "12345",
-    "isLibrarian": false
+    "isLibrarian": false,
+    "firstName": "Elaine",
+    "lastName": "Liu"
   },
   {
     "email": "hmukhta@uwo.ca",
     "password": "12345",
-    "isLibrarian": false
+    "isLibrarian": false,
+    "firstName": "Huda",
+    "lastName": "Mukhtar"
   }
 ]
