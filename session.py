@@ -118,19 +118,22 @@ class Session:
         console = Console()
         format = "blink bold white"
 
+        # TODO: can move this into a separate function
         # retrieve all the bookings corresponding to the next 7 days
         bookingsPerDay = {}
         currDate = date.today()
         for i in range(7):
             currDate = currDate + timedelta(days=i)
             bookingsPerDay[currDate] = [] # create an empty list to store the list of bookings for the day
-
+        # add all bookings for that day into a list
         for booking in self.allBookings.values():
-            bookingsPerDay[booking.start.date()].append(booking)
+            if booking.start.date in bookingsPerDay:
+                bookingsPerDay[booking.start.date()].append(booking)
 
         # show weekly availabilities - display one table per day
         for day in bookingsPerDay:
-            table = Table(title="Space Availabilities for " + day.strftime("%B %d, %Y"), show_lines=True) # create a table to display space availabilities
+            # create a table to display space availabilities
+            table = Table(title="Space Availabilities for " + day.strftime("%B %d, %Y"), show_lines=True)
             table.add_column("Table", justify="right", style="cyan", no_wrap=True)
 
             # create 12 columns for times between 9am - 9pm (library open hours)
