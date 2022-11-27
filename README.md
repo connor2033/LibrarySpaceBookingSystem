@@ -22,6 +22,26 @@ If you do not have python 3.X installed, please install it from python.org.
 
 If you are getting errors with this command, try installing pipenv again with `sudo pip install pipenv` and then running `pipenv shell` again.
 
+[PIPENV] FOR DEVELOPERS:
 
-<!-- `pipenv shell` 
-`pip install -r requirements.txt` -->
+To delete/recreate pipenv shell:
+`pipenv --rm` (This deletes the virtual environment and its Pipfile)
+`pipenv install --python 3.X`
+
+To start up the pipenv shell:
+`pipenv shell` 
+
+To install requirements into virtual environment:
+`pip install -r requirements.txt`
+
+To install a new requirement and add it to the Pipfile:
+`pipenv install <requirement>`
+
+To exit the virtual shell:
+`exit`
+
+[TESTING] FOR DEVELOPERS:
+
+To collect and run all pytests:
+
+Run `pytest` while in the main directory

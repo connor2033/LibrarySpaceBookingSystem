@@ -7,6 +7,8 @@ from user import User
 
 class Session:
     def __init__(self, curr_user):
+        self.spaces_filename = 'storage/spaces.json'
+        self.bookings_filename = 'storage/bookings.json'
         self.user = curr_user
         self.allBookings = self.loadBookings()
         self.allSpaces = self.loadSpaces()
@@ -16,7 +18,7 @@ class Session:
         """
         Read bookings.json file and loads the data into a dictionary (key, value) = (id, Booking obj)
         """
-        f = open('storage/bookings.json')
+        f = open(self.bookings_filename)
         data = json.load(f)
 
         bookings = {}
@@ -37,7 +39,7 @@ class Session:
         """
         Read spaces.json file and loads the data into a dictionary (key, value) = (id, Space obj)
         """
-        f = open('storage/spaces.json')
+        f = open(self.spaces_filename)
         data = json.load(f)
 
         spaces = {}
@@ -52,30 +54,6 @@ class Session:
 
         f.close()
         return spaces
-    
-    # def loadUsers(self):
-    #     """
-    #     Read users.json file and validate the user credentials
-    #     """
-    #     f = open('storage/users.json')
-    #     data = json.load(f)
-
-    #     users = {}
-    #     for user in data:
-    #         newUser = User(
-    #             userId = user['email'],
-    #             isLibrarian = user['isLibrarian']
-    #         )
-    #         users[user['email']] = newUser
-
-    #     f.close()
-    #     return users
-
-    def saveBookings(self):
-        pass
-    
-    def saveSpaces(self):
-        pass
     
     def getUserBookings(self):
         """
@@ -99,13 +77,21 @@ class Session:
         """
         for booking in self.userBookings.values():
             if booking.bookingId == bookingId:
-                self.userBookings.remove(booking)
-                return
+                # Remove the booking from memory
+                del self.userBookings[bookingId]
+                del self.allBookings[bookingId]
+
+                # Update the database
+                json_object = json.dumps(self.getJson(self.allBookings), indent=4)
+                with open(bookings_filename, "w") as f:
+                    f.write(json_object)
+                return  
     
-    def addSpace(self, spaceId, location, seats, outlets, accessible, quiet, private, media):
-        
+    def addSpace(self, location, seats, outlets=False, accessible=False, quiet=False, private=False, media=False):
+        # Get the next space ID
         nextSpace = max(self.allSpaces.keys()) + 1
 
+        # Build filters dictionary
         filters = {
             "outlets": outlets,
             "accesible": accessible,
@@ -114,15 +100,29 @@ class Session:
             "media":media
 
         }
+
+        # Create new space
         newSpace = Space(
-                spaceId = self.allSpaces[nextSpace],
-                seats = self.allSpaces[seats],
-                filters = self.allSpaces[filters],
-                location = self.allSpaces[location]
-            )
+            spaceId = nextSpace,
+            seats = seats,
+            filters = filters,
+            location = location
+        )
         
         self.allSpaces[nextSpace] = newSpace
+
+        # Update the database
+        json_object = json.dumps(self.getJson(self.allSpaces), indent=4)
+        with open(self.spaces_filename, "w") as f:
+            f.write(json_object)
         
+        return newSpace
     
     def removeSpace(self, spaceId):
         del self.allSpaces[spaceId]
+
+    def getJson(self, dictionary):
+        json = []
+        for value in dictionary.values():
+            json.append(value.toDict())
+        return json
