@@ -17,7 +17,7 @@ session = None
 
 def main():
     # title panel + login
-    
+
     format = "blink bold white"
     print(Panel("Library Space Management System", style=format))
 
@@ -46,7 +46,7 @@ def main():
             print("Logout ")
             sys.exit()
         elif option == "1":
-            print("Check available spaces")
+            session.viewSpace()
         elif option == "2":
             print("View my bookings")
         elif option == "3":
@@ -67,7 +67,7 @@ def login(format):
         if userEmail[-7:] != "@uwo.ca" or not re.fullmatch(emailRegex, userEmail):
             console.print("Please enter a valid UWO email address.", style=format)
             continue
-        
+
         # Get password
         userPassword = getpass("Password: ")
         validCredentials, user = validateUser(userEmail, userPassword)
@@ -78,7 +78,7 @@ def login(format):
         else:
             valid = True
             newSession = Session(user)
-    
+
     return newSession
 
 def validateUser(email, password):
