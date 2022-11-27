@@ -25,10 +25,6 @@ def main():
 
     global session
     session = login(format)
-    if session.user.isLibrarian:
-        console.print("Welcome, "+session.user.firstName+". You have librarian level permissions.", style=format)
-    else:
-        console.print("Welcome, "+session.user.firstName+". You have signed in as a student.", style=format)
 
     console.print("\nYou are now a verified user. What would you like to do?\n", style=format)
 
@@ -120,10 +116,9 @@ def validateUser(email, password):
     f.close()
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), BarColumn()) as progress:
 
-        task1 = progress.add_task("[blue]Checking Credentials", total=100)
-
+        validating = progress.add_task("[blue]Checking Credentials", total=100)
         while not progress.finished:
-            progress.update(task1, advance=1)
+            progress.update(validating, advance=1)
             time.sleep(0.005)
     
     return valid, user
