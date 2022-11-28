@@ -47,22 +47,22 @@ def test_loadBookings(session_object):
             "bookingId": 0,
             "spaceId": 2,
             "userEmail": "cdong49@uwo.ca",
-            "startTime": "2022-11-21 14:00",
-            "endTime": "2022-11-21 16:00"
+            "startTime": "2022-11-21 14:00:00",
+            "endTime": "2022-11-21 16:00:00"
         },
         {
             "bookingId": 1,
             "spaceId": 0,
             "userEmail": "eliu72@uwo.ca",
-            "startTime": "2022-11-21 11:00",
-            "endTime": "2022-11-21 13:00"
+            "startTime": "2022-11-21 11:00:00",
+            "endTime": "2022-11-21 13:00:00"
         }])
     patch_json_load = patch("json.load", mock_data)
 
     # the expected return value after parsing the json data
     expected_data = {
-        0: Booking(0, 2, "cdong49@uwo.ca", datetime.strptime("2022-11-21 14:00",'%Y-%m-%d %H:%M'), datetime.strptime("2022-11-21 16:00",'%Y-%m-%d %H:%M')),
-        1: Booking(1, 0, "eliu72@uwo.ca", datetime.strptime("2022-11-21 11:00",'%Y-%m-%d %H:%M'), datetime.strptime("2022-11-21 13:00",'%Y-%m-%d %H:%M'))
+        0: Booking(0, 2, "cdong49@uwo.ca", datetime.strptime("2022-11-21 14:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2022-11-21 16:00:00",'%Y-%m-%d %H:%M:%S')),
+        1: Booking(1, 0, "eliu72@uwo.ca", datetime.strptime("2022-11-21 11:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2022-11-21 13:00:00",'%Y-%m-%d %H:%M:%S'))
     }
 
     # using the mocks, test loadBookings function
