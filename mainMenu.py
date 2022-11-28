@@ -19,7 +19,7 @@ session = None
 
 def main():
     # title panel + login
-    
+
     format = "blink bold white"
     print(Panel("Library Space Management System", style=format))
 
@@ -52,6 +52,7 @@ def main():
         elif option == "1":
             console.clear()
             print("Check available spaces")
+            session.viewSpace()
         elif option == "2":
             console.clear()
             print("View my bookings")
@@ -77,7 +78,7 @@ def login(format):
             console.clear()
             console.print("[red]Please enter a valid UWO email address.", style=format)
             continue
-        
+
         # Get password
         userPassword = getpass("Password: ")
         validCredentials, user = validateUser(userEmail, userPassword)
@@ -89,13 +90,13 @@ def login(format):
         else:
             valid = True
             newSession = Session(user)
-    
+
     console.clear()
     if newSession.user.isLibrarian:
         console.print("[green]Welcome, "+newSession.user.firstName+". You have librarian level permissions.", style=format)
     else:
         console.print("[green]Welcome, "+newSession.user.firstName+". You have signed in as a student.", style=format)
-    
+
     return newSession
 
 def validateUser(email, password):
@@ -120,7 +121,7 @@ def validateUser(email, password):
         while not progress.finished:
             progress.update(validating, advance=1)
             time.sleep(0.005)
-    
+
     return valid, user
 
 
