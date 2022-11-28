@@ -126,6 +126,12 @@ class Session:
     def removeSpace(self, spaceId):
         del self.allSpaces[spaceId]
 
+        # Update the database
+        json_object = json.dumps(self.getJson(self.allSpaces), indent=4)
+        with open(self.spaces_filename, "w") as f:
+            f.write(json_object)
+        
+
     def getJson(self, dictionary):
         json = []
         for value in dictionary.values():

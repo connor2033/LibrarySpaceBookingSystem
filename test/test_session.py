@@ -10,7 +10,7 @@ from space import Space
 # Returns a test user
 @pytest.fixture
 def curr_user():
-    user = User(userId=123, isLibrarian=False)
+    user = User(userId=123, isLibrarian=False, firstName="first name", lastName="last name")
     return user
 
 # Returns a test session object
@@ -171,4 +171,4 @@ def test_removeSpace(session_object):
         assert newSpaceId not in session_object.allSpaces
 
         # check that changes are saved to db
-        p_open.assert_called_once()
+        p_open.call_count == 2 # 1 call for addSpace, 1 call for removeSpace
