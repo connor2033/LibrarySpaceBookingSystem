@@ -10,6 +10,8 @@ from space import Space
 from user import User
 from datetime import datetime
 import sys
+import keyboard
+import time
 
 class Session:
 
@@ -126,8 +128,8 @@ class Session:
         spaceTable.add_column("Option", justify="right", style="cyan", no_wrap=True)
         spaceTable.add_column("Table", style="white")
         for spaceId, space in self.allSpaces.items():
-            console.print(pref)
-            console.print(space.filters)
+            # console.print(pref)
+            # console.print(space.filters)
             if (space.filters == pref) and (space.seats >= int(minSeats)):
                 results = True
                 spaceTable.add_row(str(spaceId), str(space.location))
@@ -136,24 +138,27 @@ class Session:
             console.print(spaceTable)
             spaceId = input()
         else:
-            console.print("There are no spaces booked on your selected preferences. Goodbye")
-            sys.exit()
+            console.print("There are no spaces booked on your selected preferences")
+            # Time delay
+            # console.clear()
+            return
 
         # prompt to select time and duration of booking
-        time = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm"])
-        if (self.user.isLibrarian):
+        bookTime = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm"])
+        if (not self.user.isLibrarian):
             duration = Prompt.ask("Would you like to book this space for 1 or 2 hours?", choices=["1", "2"])
         else:
             console.print("How many hours would you like to book this space for?")
             duration = input()
 
         # convert booking time to a datetime formatted string
-        if "am" in time:
-            bookDate = bookDate + " " + time.strip("am") + ":00:00"
-            endTime = bookDate + " " + str(int(time.strip("am")) + int(duration)) + ":00:00"
+        if "am" in bookTime:
+            bookTime = int(bookTime.strip("am"))
         else:
-            bookDate = bookDate + " " + str(int(time.strip("pm"))+12) + ":00:00"
-            endTime = bookDate + " " + str(int(time.strip("pm")) + int(duration)) + ":00:00"
+            bookTime = int(bookTime.strip("pm"))
+            
+        endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
+        bookDate = bookDate + " " + str(bookTime) + ":00:00"
 
         # Get the next booking id
         nextBookingId = max(self.allBookings.keys()) + 1
@@ -256,6 +261,8 @@ class Session:
             if booking.start.date() in bookingsPerDay:
                 bookingsPerDay[booking.start.date()].append(booking)
 
+        tables = []
+
         # show weekly availabilities - display one table per day
         for day in bookingsPerDay:
             # create a table to display space availabilities
@@ -264,19 +271,18 @@ class Session:
 
             # create 12 columns for times between 9am - 9pm (library open hours)
             for i in range(13):
-                time = i + 9
-                if time > 12:
-                    time = str(time % 12) + "pm"
+                hour = i + 9
+                if hour > 12:
+                    hour = str(hour % 12) + "pm"
                 else:
-                    time = str(time) + "am"
-                table.add_column(time, style="white")
+                    hour = str(hour) + "am"
+                table.add_column(hour, style="white")
 
             # spaces = self.allSpaces
             for spaceId, space in self.allSpaces.items():
                 spaceAvailability = ["" for _ in range(12)] # each empty string represents an empty space
                 for booking in bookingsPerDay[day]:
                     if booking.spaceId == spaceId:
-                        console.print("TRUE")
                         startIndex = booking.start.hour - 9
                         endIndex = booking.end.hour - 9
                         for index in range(startIndex, endIndex):
@@ -298,16 +304,40 @@ class Session:
                     spaceAvailability[11]
                 )
 
-            console.print(table)
+            tables.append(table)
+            # console.print(table)
 
-        # Ask if user wants to book
-        console.print("Would you like to book a space? Please enter Y for yes or N for no", style=format)
-        option = input()
-        if (option == "Y"):
-            console.clear()
-            self.addBooking()
-            return
-        else:
-            return
+        curr = 0
+        refresh = True
+        viewing = True
+        while viewing:
+            
+            if refresh:
+                console.clear()
+                console.print(tables[curr])
+                refresh = False
+
+                console.print("Press < > to cycle through tables", style=format)
+                # Ask if user wants to book
+                console.print("Would you like to book a space? Please enter Y for yes or N for no", style=format)
+
+            if keyboard.is_pressed('right'):
+                time.sleep(0.2)
+                if curr < 6:
+                    curr = curr+1
+                    refresh = True
+            elif keyboard.is_pressed('left'):
+                time.sleep(0.2)
+                if curr > 0:
+                    curr = curr-1
+                    refresh = True
+            elif keyboard.is_pressed('Y') or keyboard.is_pressed('y'):
+                time.sleep(0.5)
+                console.clear()
+                self.addBooking()
+                return
+            elif keyboard.is_pressed('N') or keyboard.is_pressed('n'):
+                time.sleep(0.2)
+                return
 
 
