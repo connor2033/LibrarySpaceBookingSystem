@@ -1,12 +1,15 @@
-import json
-from datetime import datetime
 from datetime import date
 from datetime import timedelta
+import datetime
+import json
 from rich.table import Table
 from rich.console import Console
+from rich.prompt import Prompt
 from booking import Booking
 from space import Space
 from user import User
+from datetime import datetime
+import sys
 
 class Session:
 
@@ -31,8 +34,8 @@ class Session:
                 bookingId = booking['bookingId'],
                 spaceId = booking['spaceId'],
                 userId = booking['userEmail'],
-                start = datetime.strptime(booking['startTime'], '%Y-%m-%d %H:%M'),
-                end = datetime.strptime(booking['endTime'], '%Y-%m-%d %H:%M')
+                start = datetime.strptime(booking['startTime'], '%Y-%m-%d %H:%M:%S'),
+                end = datetime.strptime(booking['endTime'], '%Y-%m-%d %H:%M:%S')
             )
             bookings[booking['bookingId']] = newBooking
 
@@ -74,6 +77,103 @@ class Session:
         Return all bookings that the user booked
         """
         return self.userBookings
+
+    def addBooking(self):
+        """
+        Add a new booking to the system
+        """
+        # set up properties and console for rich library and pretty layout
+        console = Console()
+        format = "blink bold white"
+
+        # table with day options
+        table = Table(title="Days Available")
+        table.add_column("Option", justify="right", style="cyan", no_wrap=True)
+        table.add_column("Action", style="magenta")
+        option = ""
+        dates = {}
+        for i in range(7):
+            currDate = date.today() + timedelta(days=i)
+            dates.update({str(i):str(currDate)})
+            table.add_row(str(i),currDate.strftime("%B %d, %Y"))
+
+        # request date of booking
+        console.print("What day would you like to book for? Please enter the option:", style=format)
+        console.print(table)
+        option = input()
+        bookDate = dates[option]
+
+        # prompt to select filters
+        console.print("Would you like to view a space that:")
+        outlets = Prompt.ask("Has outlets", choices=["True", "False"])
+        media = Prompt.ask("Has media? i.e. tv", choices=["True", "False"])
+        accessible = Prompt.ask("Is accessible?", choices=["True", "False"])
+        quiet = Prompt.ask("Is a quiet zone?", choices=["True", "False"])
+        closed = Prompt.ask("Is a closed space?", choices=["True", "False"])
+        console.print("What are the minimum number of seats that you require?", style=format)
+        minSeats = input()
+        pref = {
+            "outlets": eval(outlets),
+            "accessible": eval(accessible),
+            "quiet": eval(quiet),
+            "private": eval(closed),
+            "media": eval(media)
+        }
+
+        # prompt to select from space availabilities
+        results = False
+        spaceTable = Table(title="Spaces", show_lines=True)
+        spaceTable.add_column("Option", justify="right", style="cyan", no_wrap=True)
+        spaceTable.add_column("Table", style="white")
+        for spaceId, space in self.allSpaces.items():
+            console.print(pref)
+            console.print(space.filters)
+            if (space.filters == pref) and (space.seats >= int(minSeats)):
+                results = True
+                spaceTable.add_row(str(spaceId), str(space.location))
+        if results:
+            console.print("What space would you like to book?:", style=format)
+            console.print(spaceTable)
+            spaceId = input()
+        else:
+            console.print("There are no spaces booked on your selected preferences. Goodbye")
+            sys.exit()
+
+        # prompt to select time and duration of booking
+        time = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm"])
+        if (self.user.isLibrarian):
+            duration = Prompt.ask("Would you like to book this space for 1 or 2 hours?", choices=["1", "2"])
+        else:
+            console.print("How many hours would you like to book this space for?")
+            duration = input()
+
+        # convert booking time to a datetime formatted string
+        if "am" in time:
+            bookDate = bookDate + " " + time.strip("am") + ":00:00"
+            endTime = bookDate + " " + str(int(time.strip("am")) + int(duration)) + ":00:00"
+        else:
+            bookDate = bookDate + " " + str(int(time.strip("pm"))+12) + ":00:00"
+            endTime = bookDate + " " + str(int(time.strip("pm")) + int(duration)) + ":00:00"
+
+        # Get the next booking id
+        nextBookingId = max(self.allBookings.keys()) + 1
+
+        # Create a new booking
+        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, bookDate, endTime)
+
+        # Add booking to the system and database
+        self.allBookings[nextBookingId] = newBooking
+
+        json_object = json.dumps(self.getJson(self.allBookings), indent=4)
+        with open(self.bookings_filename, "w") as f:
+            f.write(json_object)
+
+        # Confirm booking
+        console.print("Your booking is confirmed for: " + bookDate, style=format)
+
+        return newBooking
+
+
 
     def cancelBooking(self, bookingId):
         """
@@ -143,11 +243,11 @@ class Session:
         bookingsPerDay = {}
         currDate = date.today()
         for i in range(7):
-            currDate = currDate + timedelta(days=i)
+            currDate = date.today() + timedelta(days=i)
             bookingsPerDay[currDate] = [] # create an empty list to store the list of bookings for the day
         # add all bookings for that day into a list
         for booking in self.allBookings.values():
-            if booking.start.date in bookingsPerDay:
+            if booking.start.date() in bookingsPerDay:
                 bookingsPerDay[booking.start.date()].append(booking)
 
         # show weekly availabilities - display one table per day
@@ -170,6 +270,7 @@ class Session:
                 spaceAvailability = ["" for _ in range(12)] # each empty string represents an empty space
                 for booking in bookingsPerDay[day]:
                     if booking.spaceId == spaceId:
+                        console.print("TRUE")
                         startIndex = booking.start.hour - 9
                         endIndex = booking.end.hour - 9
                         for index in range(startIndex, endIndex):
@@ -195,4 +296,12 @@ class Session:
 
         # Ask if user wants to book
         console.print("Would you like to book a space? Please enter Y for yes or N for no", style=format)
+        option = input()
+        if (option == "Y"):
+            console.clear()
+            self.addBooking()
+            return
+        else:
+            return
+
 

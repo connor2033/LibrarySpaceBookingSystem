@@ -51,7 +51,6 @@ def main():
             sys.exit()
         elif option == "1":
             console.clear()
-            print("Check available spaces")
             session.viewSpace()
         elif option == "2":
             console.clear()
