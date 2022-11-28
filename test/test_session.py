@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime
+from datetime import timedelta
 
 import session
 from user import User
@@ -18,8 +19,8 @@ def curr_user():
 def session_object(curr_user):
     # mock bookings dictionary in Session object
     mock_data_bookings = MagicMock(return_value = {
-        0: Booking(0, 2, "cdong49@uwo.ca", datetime.strptime("2022-11-21 14:00",'%Y-%m-%d %H:%M'), datetime.strptime("2022-11-21 15:00",'%Y-%m-%d %H:%M')),
-        1: Booking(1, 0, "eliu72@uwo.ca", datetime.strptime("2022-11-21 14:00",'%Y-%m-%d %H:%M'), datetime.strptime("2022-11-21 15:00",'%Y-%m-%d %H:%M'))
+        0: Booking(0, 2, "cdong49@uwo.ca", datetime.strptime("2022-11-21 14:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2022-11-21 16:00:00",'%Y-%m-%d %H:%M:%S')),
+        1: Booking(1, 0, "eliu72@uwo.ca", datetime.strptime("2022-11-21 11:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2022-11-21 13:00:00",'%Y-%m-%d %H:%M:%S'))
     })
     patch_loadBookings = patch("session.Session.loadBookings", mock_data_bookings)
 
@@ -132,15 +133,40 @@ def test_loadSpaces(session_object):
 
 
 # test add booking function to make sure that we update the dict and json data
-def test_addBooking():
-    # Add a booking and check that it was added correctly
-    pass
+def test_addBooking(session_object):
+    # we don't want to actually write to the file so we mock this funciton
+    patch_open = patch("builtins.open", MagicMock()) 
+    with patch_open as p_open:
+        newBooking = session_object.addBooking("12", datetime.today(), datetime.today()+timedelta(hours=1))
+
+        # check that new booking is in the bookings dict
+        assert newBooking == session_object.allBookings[newBooking.bookingId]
+
+        # check that new booking is added to user bookings
+        assert newBooking in session_object.userBookings
+
+        # check that we tried to add to database
+        p_open.assert_called_once()
 
 
 # test cancelBooking function to make sure that we update the dict and json data
-def test_cancelBooking():
-    # Add a booking and attempt to delete it
-    pass
+def test_cancelBooking(session_object):
+    # we don't want to actually write to the file so we mock this funciton
+    patch_open = patch("builtins.open", MagicMock())
+    with patch_open as p_open:
+        # add a fake booking and try to remove it
+        newBooking = session_object.addBooking("13", datetime.today(), datetime.today()+timedelta(hours=1))
+        newBookingId = newBooking.bookingId
+        
+        # remove the new booking
+        session_object.cancelBooking(newBookingId)
+
+        # check that the booking is no longer in the dict
+        assert newBooking not in session_object.userBookings
+        assert newBookingId not in session_object.allBookings
+
+        # check that changes are saved to db
+        assert p_open.call_count == 2 # 1 call for addBooking, 1 call for removeBooking
 
 
 # function to make sure that adding a space updates in memory dict and database
@@ -171,4 +197,4 @@ def test_removeSpace(session_object):
         assert newSpaceId not in session_object.allSpaces
 
         # check that changes are saved to db
-        p_open.call_count == 2 # 1 call for addSpace, 1 call for removeSpace
+        assert p_open.call_count == 2 # 1 call for addSpace, 1 call for removeSpace

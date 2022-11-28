@@ -80,7 +80,7 @@ class Session:
         """
         return self.userBookings
 
-    def addBooking(self):
+    def addBookingPrompt(self):
         """
         Add a new booking to the system
         """
@@ -160,21 +160,26 @@ class Session:
         endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
         bookDate = bookDate + " " + str(bookTime) + ":00:00"
 
+        self.addBooking(spaceId, bookDate, endTime)
+
+        # Confirm booking
+        console.print("Your booking is confirmed for: " + startTime, style=format)
+
+
+    def addBooking(self, spaceId, startTime, endTime):
         # Get the next booking id
         nextBookingId = max(self.allBookings.keys()) + 1
 
         # Create a new booking
-        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, bookDate, endTime)
+        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, startTime, endTime)
 
         # Add booking to the system and database
         self.allBookings[nextBookingId] = newBooking
+        self.userBookings.append(newBooking)
 
         json_object = json.dumps(self.getJson(self.allBookings), indent=4)
         with open(self.bookings_filename, "w") as f:
             f.write(json_object)
-
-        # Confirm booking
-        console.print("Your booking is confirmed for: " + bookDate, style=format)
 
         return newBooking
 
@@ -184,12 +189,15 @@ class Session:
         """
         Iterate through user bookings and remove the specified booking
         """
-        for booking in self.userBookings.values():
+        # Delete the booking from the all bookings dictionary
+        del self.allBookings[bookingId]
+
+        # Also remove from user bookings list
+        for booking in self.userBookings:
             if booking.bookingId == bookingId:
 
                 # Remove the booking from memory
-                del self.userBookings[bookingId]
-                del self.allBookings[bookingId]
+                self.userBookings.remove(booking)
 
                 # Update the database
                 json_object = json.dumps(self.getJson(self.allBookings), indent=4)
