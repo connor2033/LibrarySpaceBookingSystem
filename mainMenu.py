@@ -62,6 +62,7 @@ def main():
         elif option == "4" and session.user.isLibrarian:
             console.clear()
             print("Remove a study space")
+        console.print(table)
 
 def login(format):
 
