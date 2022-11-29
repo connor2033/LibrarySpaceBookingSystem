@@ -220,7 +220,7 @@ def addBookingPrompt(dayInt):
     startTime = bookDate + " " + str(bookTime) + ":00:00"
 
     if session.addBooking(spaceId, startTime, endTime) == False:
-        console.print("This space is not available for that date and time. Please check the available spaces again.",style=format)
+        console.print("This space is not available for that date and time. Or the time chosen is in the past. Please check the available spaces again.",style=format)
         return
 
     console.clear()

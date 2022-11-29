@@ -109,6 +109,10 @@ class Session:
         """
         Checks if booking time does not overlap with an existing booking, then adds it to the database
         """
+        # verify that chosen time is in the future
+        if  datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S') < datetime.now():
+            return False
+
         # verify that there isn't already a booking with the specified start time
         for booking in self.getBookingsPerSpace(spaceId):
             # case 1: an existing booking is nested inside the chosen time
@@ -125,7 +129,10 @@ class Session:
                 return False
 
         # Get the next booking id
-        nextBookingId = max(self.allBookings.keys()) + 1
+        nextBookingId = 1
+        if self.allBookings:
+            nextBookingId = max(self.allBookings.keys()) + 1
+
 
         # Create a new booking
         newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S'), datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S'))
