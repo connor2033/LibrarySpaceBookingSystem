@@ -68,5 +68,19 @@
         "userEmail": "chaines4@uwo.ca",
         "startTime": "2022-12-01 09:00:00",
         "endTime": "2022-12-01 13:00:00"
+    },
+    {
+        "bookingId": 17,
+        "spaceId": 4,
+        "userEmail": "eliu72@uwo.ca",
+        "startTime": "2022-11-29 10:00:00",
+        "endTime": "2022-11-29 12:00:00"
+    },
+    {
+        "bookingId": 18,
+        "spaceId": 5,
+        "userEmail": "chaines4@uwo.ca",
+        "startTime": "2022-11-29 10:00:00",
+        "endTime": "2022-11-29 13:00:00"
     }
 ]
