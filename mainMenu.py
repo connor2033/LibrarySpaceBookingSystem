@@ -1,4 +1,4 @@
-from user import User
+from models.user import User
 from session import Session
 from rich.console import Console
 from rich import print
@@ -11,15 +11,17 @@ from getpass import getpass
 import re
 import sys
 import json
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
 def main():
     global console, format
     console = Console()
+    console.clear()
     format = "blink bold white"
 
     # title panel + login
-    print(Panel("Library Space Management System", style=format))
+    headerPanel = Panel("Library Space Management System", style=format)
+    console.print(headerPanel)
 
     global session
     session = login(format)
@@ -36,11 +38,12 @@ def main():
         table.add_row("3","Add a study space")
         table.add_row("4","Remove a study space")
     table.add_row("0","Logout")
-    console.print(table)
+    
 
     # loop for user input
     option = ""
     while not (option == "0"):
+        console.print(table)
         option = input()
         if option == "0":
             console.clear()
@@ -56,12 +59,10 @@ def main():
             cancelBookingPrompt()
         elif option == "3" and session.user.isLibrarian:
             console.clear()
-            session.addSpace()
-            console.clear()
+            addSpacePrompt()
         elif option == "4" and session.user.isLibrarian:
             console.clear()
             removeSpacePrompt()
-        console.print(table)
 
 def login(format):
 
@@ -158,25 +159,31 @@ def addBookingPrompt(dayInt):
     spaceTable = Table(title="Spaces", show_lines=True)
     spaceTable.add_column("Option", justify="right", style="cyan", no_wrap=True)
     spaceTable.add_column("Table", style="white")
+
+    spaceIds = []
     for spaceId, space in session.allSpaces.items():
         spaceHasFilters = True
         for filterId, filterValue in space.filters.items():
-            # we only want to keep spaces where the filter preferences match or if the preference does not matter to user
+            # Only keep spaces where the filter preferences match or if the preference does not matter to user
             if not (pref[filterId] == filterValue or pref[filterId] is False):
                 spaceHasFilters = False
         if (spaceHasFilters) and (space.seats >= int(minSeats)):
             results = True
             spaceTable.add_row(str(spaceId), str(space.location))
+            spaceIds.append(str(spaceId))
+
     if results:
-        console.print("What space would you like to book?:", style=format)
         console.print(spaceTable)
-        spaceId = input()
+        spaceId = Prompt.ask("What space would you like to book?:", choices=spaceIds)
     else:
+        console.clear()
         console.print("There are no spaces available with your selected preferences",style=format)
         return
     
      # prompt to select time and duration of booking
     bookTime = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm"])
+    
+    # Logic to check if duration extends booking past 9pm
     durationApproved = False
     while not durationApproved:
         if (not session.user.isLibrarian):
@@ -198,7 +205,7 @@ def addBookingPrompt(dayInt):
                 bookTime = int(bookTime[:-2]) + 12
             else:
                 console.clear()
-                console.print("[red]Invalid duration.",format=format)
+                console.print("[red]Invalid duration.",style=format)
 
 
     endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
@@ -208,8 +215,9 @@ def addBookingPrompt(dayInt):
         console.print("This space is not available for that date and time. Please check the available spaces again.",style=format)
         return
 
+    console.clear()
     # Confirm booking
-    console.print("Your booking is confirmed for: " + startTime, style=format)
+    console.print("Your booking is confirmed for: " + startTime+"\n", style=format)
 
 def viewSpaces():
     """
@@ -272,10 +280,11 @@ def viewSpaces():
             console.print(tables[curr])
             refresh = False
 
-            console.print("Enter < to go back and > to go forward", style=format)
             # Ask if user wants to book
-            res = console.print("Would you like to book a space? Please enter Y for yes or N for no", style=format)
-            res = input()
+            res = console.print("Enter (1) to book a space on this day or (2) to return to the Main Menu", style=format)
+            console.print("Enter (<) to go back and (>) to go forward", style=format)
+        
+        res = input()
 
         if (res == '>' or res == '.'):
             time.sleep(0.2)
@@ -287,12 +296,12 @@ def viewSpaces():
             if curr > 0:
                 curr = curr-1
                 refresh = True
-        elif (res == 'Y') or (res == 'y'):
+        elif (res == '1') or (res == 'y'):
             time.sleep(0.5)
             console.clear()
             addBookingPrompt(curr)
             return
-        elif (res == 'N') or (res == 'n'):
+        elif (res == '2') or (res == 'n'):
             time.sleep(0.2)
             console.clear()
             return
@@ -316,6 +325,7 @@ def removeSpacePrompt():
 
     # remove space from database
     session.removeSpace(spaceId)
+    console.clear()
     console.print("Space Id " + spaceId + " has been removed from the System\n",style=format)
 
 def addSpacePrompt():
@@ -327,27 +337,35 @@ def addSpacePrompt():
     # Prompt to input filters
     console.print("Please enter the location name (ex. Taylor - Room 155)",style=format)
     spaceName = input()
-    outlets = Prompt.ask("Has outlets", choices=["True", "False"])
-    media = Prompt.ask("Has media? i.e. tv", choices=["True", "False"])
-    accessible = Prompt.ask("Is accessible?", choices=["True", "False"])
-    quiet = Prompt.ask("Is a quiet zone?", choices=["True", "False"])
-    closed = Prompt.ask("Is a closed space?", choices=["True", "False"])
+    outlets = Prompt.ask("Has outlets", choices=["y", "n"])
+    media = Prompt.ask("Has media? i.e. tv", choices=["y", "n"])
+    accessible = Prompt.ask("Is accessible?", choices=["y", "n"])
+    quiet = Prompt.ask("Is a quiet zone?", choices=["y", "n"])
+    closed = Prompt.ask("Is a closed space?", choices=["y", "n"])
     console.print("What are the minimum number of seats available?",style=format)
     minSeats = input()
 
     # add space to database
-    session.addSpace(spaceName, minSeats, outlets, media, accessible, quiet, closed)
+    session.addSpace(spaceName, 
+                    minSeats, 
+                    "True" if outlets == "y" else "False", 
+                    "True" if media == "y" else "False", 
+                    "True" if accessible == "y" else "False", 
+                    "True" if quiet == "y" else "False", 
+                    "True" if closed == "y" else "False"
+                    )
+    console.clear()
     console.print(spaceName + " has been added to the system", style=format)
 
 def cancelBookingPrompt():
     """
     Ask user if they would like to cancel a booking
     """
-    console.print("What would you like to do? Enter (1) to return to the Main Menu or (2) to cancel a booking", style=format)
+    console.print("What would you like to do? Enter (1) to cancel a booking or (2) to return to the Main Menu", style=format)
     action = int(input())
 
     # return to main menu if input == 1
-    if action == 1:
+    if action == 2:
         console.clear()
         return
 
@@ -358,6 +376,7 @@ def cancelBookingPrompt():
         console.print("Invalid booking ID", style=format)
         cancelBookingPrompt()
     else:
+        console.clear()
         console.print("Booking " + str(bookingId) + " successfully cancelled.\n",style=format)
 
 

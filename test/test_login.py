@@ -2,7 +2,7 @@ from unittest.mock import patch, MagicMock
 
 
 import mainMenu
-from user import User
+from models.user import User
 
 # test validateUser function to make sure it is verifying credentials correctly
 def test_validateUser():

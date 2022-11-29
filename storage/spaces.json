@@ -12,18 +12,6 @@
         }
     },
     {
-        "spaceId": 1,
-        "location": "Taylor - Floor G",
-        "seats": 1,
-        "filters": {
-            "outlets": true,
-            "accessible": true,
-            "quiet": true,
-            "private": false,
-            "media": false
-        }
-    },
-    {
         "spaceId": 2,
         "location": "Weldon - Room 17",
         "seats": 6,
@@ -48,9 +36,9 @@
         }
     },
     {
-        "spaceId": 4,
-        "location": "Test room 123",
-        "seats": 6,
+        "spaceId": 6,
+        "location": "Middlesex - Room 116",
+        "seats": 8,
         "filters": {
             "outlets": true,
             "accessible": true,
@@ -60,14 +48,14 @@
         }
     },
     {
-        "spaceId": 5,
-        "location": "Test Room #2",
-        "seats": 7,
+        "spaceId": 7,
+        "location": "UCC - Room 41",
+        "seats": 16,
         "filters": {
             "outlets": true,
             "accessible": true,
-            "quiet": true,
-            "private": false,
+            "quiet": false,
+            "private": true,
             "media": true
         }
     }

@@ -4,9 +4,9 @@ from datetime import datetime
 from datetime import timedelta
 
 import session
-from user import User
-from booking import Booking
-from space import Space
+from models.user import User
+from models.booking import Booking
+from models.space import Space
 
 # Returns a test user
 @pytest.fixture
