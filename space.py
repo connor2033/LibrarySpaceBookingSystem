@@ -7,7 +7,7 @@ class Space:
         self.location = location
     
     def toDict(self):
-        {
+        return {
             "spaceId": self.spaceId,
             "location": self.location,
             "seats": self.seats,

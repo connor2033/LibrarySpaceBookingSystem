@@ -211,28 +211,43 @@ class Session:
         with open(self.bookings_filename, "w") as f:
             f.write(json_object)
 
-    def addSpace(self, location, seats, outlets=False, accessible=False, quiet=False, private=False, media=False):
-        # Get the next space ID
+    def addSpace(self):
+        console = Console()
+        
+        console.print("Adding a Study Space, Please answer the following:")
+        
+        # Prompt to input filters
+        console.print("Please enter the location name (ex. Taylor - Room 155)")
+        spaceName = input()
+        outlets = Prompt.ask("Has outlets", choices=["True", "False"])
+        media = Prompt.ask("Has media? i.e. tv", choices=["True", "False"])
+        accessible = Prompt.ask("Is accessible?", choices=["True", "False"])
+        quiet = Prompt.ask("Is a quiet zone?", choices=["True", "False"])
+        closed = Prompt.ask("Is a closed space?", choices=["True", "False"])
+        console.print("What are the minimum number of seats that you require?")
+        minSeats = input()
+
+        # Finding new unique key to add to the space json file 
         nextSpace = max(self.allSpaces.keys()) + 1
 
         # Build filters dictionary
         filters = {
-            "outlets": outlets,
-            "accesible": accessible,
-            "quiet": quiet,
-            "private":private,
-            "media":media
-
+            "outlets": eval(outlets),
+            "accesible": eval(accessible),
+            "quiet": eval(quiet),
+            "private": eval(closed),
+            "media": eval(media)
         }
 
         # Create new space
         newSpace = Space(
             spaceId = nextSpace,
-            seats = seats,
+            seats = int(minSeats),
+            location = spaceName,
             filters = filters,
-            location = location
         )
 
+        # Add space to System
         self.allSpaces[nextSpace] = newSpace
 
         # Update the database
@@ -240,12 +255,23 @@ class Session:
         with open(self.spaces_filename, "w") as f:
             f.write(json_object)
 
+        print(spaceName + " has been added to the system")
+
         return newSpace
+        
 
-    def removeSpace(self, spaceId):
-        del self.allSpaces[spaceId]
+    def removeSpace(self):
+        console = Console()
 
-        # Update the database
+        # Prompt to ask which space ID to remove
+        console.print("What is the Space ID you would like to remove?")
+        spaceId = input()
+
+        # Delete space from system
+        del self.allSpaces[int(spaceId)]
+        print("Space Id " + spaceId + " has been removed from the System")
+
+        # Remove from the database
         json_object = json.dumps(self.getJson(self.allSpaces), indent=4)
         with open(self.spaces_filename, "w") as f:
             f.write(json_object)
