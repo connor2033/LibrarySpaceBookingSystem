@@ -1,12 +1,5 @@
 [
     {
-        "bookingId": 0,
-        "spaceId": 2,
-        "userEmail": "cdong49@uwo.ca",
-        "startTime": "2022-11-28 09:00:00",
-        "endTime": "2022-11-28 11:00:00"
-    },
-    {
         "bookingId": 1,
         "spaceId": 0,
         "userEmail": "eliu72@uwo.ca",
@@ -49,25 +42,11 @@
         "endTime": "2022-11-30 12:00:00"
     },
     {
-        "bookingId": 8,
-        "spaceId": 0,
-        "userEmail": "chaines4@uwo.ca",
-        "startTime": "2022-11-28 06:00:00",
-        "endTime": "2022-11-28 07:00:00"
-    },
-    {
         "bookingId": 9,
         "spaceId": 2,
         "userEmail": "chaines4@uwo.ca",
         "startTime": "2022-12-01 08:00:00",
         "endTime": "2022-12-01 10:00:00"
-    },
-    {
-        "bookingId": 10,
-        "spaceId": 2,
-        "userEmail": "chaines4@uwo.ca",
-        "startTime": "2022-11-28 11:00:00",
-        "endTime": "2022-11-28 13:00:00"
     },
     {
         "bookingId": 11,
@@ -77,20 +56,6 @@
         "endTime": "2022-12-02 05:00:00"
     },
     {
-        "bookingId": 12,
-        "spaceId": 2,
-        "userEmail": "chaines4@uwo.ca",
-        "startTime": "2022-11-28 08:00:00",
-        "endTime": "2022-11-28 09:00:00"
-    },
-    {
-        "bookingId": 13,
-        "spaceId": 0,
-        "userEmail": "chaines4@uwo.ca",
-        "startTime": "2022-11-28 20:00:00",
-        "endTime": "2022-11-28 21:00:00"
-    },
-    {
         "bookingId": 14,
         "spaceId": 1,
         "userEmail": "chaines4@uwo.ca",
@@ -98,17 +63,10 @@
         "endTime": "2022-11-29 19:00:00"
     },
     {
-        "bookingId": 15,
-        "spaceId": 0,
-        "userEmail": "chaines4@uwo.ca",
-        "startTime": "2022-11-28 10:00:00",
-        "endTime": "2022-11-28 13:00:00"
-    },
-    {
         "bookingId": 16,
         "spaceId": 0,
         "userEmail": "chaines4@uwo.ca",
-        "startTime": "2022-12-01 9:00:00",
+        "startTime": "2022-12-01 09:00:00",
         "endTime": "2022-12-01 13:00:00"
     }
 ]
