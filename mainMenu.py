@@ -1,6 +1,3 @@
-import datetime
-from booking import Booking
-from space import Space
 from user import User
 from session import Session
 from rich.console import Console
@@ -63,6 +60,7 @@ def main():
         elif option == "4" and session.user.isLibrarian:
             console.clear()
             session.removeSpace()
+        console.clear()
         console.print(table)
 
 def login(format):

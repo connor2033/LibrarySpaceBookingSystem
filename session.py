@@ -7,9 +7,7 @@ from rich.console import Console
 from rich.prompt import Prompt
 from booking import Booking
 from space import Space
-from user import User
 from datetime import datetime
-import sys
 import keyboard
 import time
 
@@ -173,7 +171,7 @@ class Session:
         nextBookingId = max(self.allBookings.keys()) + 1
 
         # Create a new booking
-        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, startTime, endTime)
+        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S'), datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S'))
 
         # Add booking to the system and database
         self.allBookings[nextBookingId] = newBooking
@@ -212,7 +210,7 @@ class Session:
             console.print("Booking " + str(bookingId) + " successfully cancelled.\n")
         
 
-    def cancelBooking(self, bookingId):
+    def cancelBooking(self, bookingId, cancelForAllUsers=False):
         """
         Iterate through user bookings and remove the specified booking
         """
@@ -221,7 +219,7 @@ class Session:
             if bookingId == booking.bookingId:
                 bookingExists = True
 
-        if bookingExists:
+        if bookingExists or cancelForAllUsers:
             # Delete the booking from the all bookings dictionary
             del self.allBookings[bookingId]
 
@@ -250,7 +248,7 @@ class Session:
         accessible = Prompt.ask("Is accessible?", choices=["True", "False"])
         quiet = Prompt.ask("Is a quiet zone?", choices=["True", "False"])
         closed = Prompt.ask("Is a closed space?", choices=["True", "False"])
-        console.print("What are the minimum number of seats that you require?")
+        console.print("What are the minimum number of seats available?")
         minSeats = input()
 
         # Finding new unique key to add to the space json file 
@@ -259,7 +257,7 @@ class Session:
         # Build filters dictionary
         filters = {
             "outlets": eval(outlets),
-            "accesible": eval(accessible),
+            "accessible": eval(accessible),
             "quiet": eval(quiet),
             "private": eval(closed),
             "media": eval(media)
@@ -288,6 +286,15 @@ class Session:
 
     def removeSpace(self):
         console = Console()
+        
+        allSpacesTable = Table(title="All Study Spaces", show_lines=True)
+        allSpacesTable.add_column("Space ID", justify="center", style="cyan", no_wrap=True)
+        allSpacesTable.add_column("Location", justify="center", style="cyan", no_wrap=True)
+        allSpacesTable.add_column("Number of Seats", justify="center", style="cyan", no_wrap=True)
+
+        for spaceId, space in self.allSpaces.items():
+            allSpacesTable.add_row(str(space.spaceId), space.location, str(space.seats))
+        console.print(allSpacesTable)
 
         # Prompt to ask which space ID to remove
         console.print("What is the Space ID you would like to remove?")
@@ -296,6 +303,11 @@ class Session:
         # Delete space from system
         del self.allSpaces[int(spaceId)]
         print("Space Id " + spaceId + " has been removed from the System")
+
+        tempSpaces = self.allBookings.copy()
+        for bookingId, booking in tempSpaces.items():
+            if booking.spaceId == int(spaceId):
+                self.cancelBooking(bookingId, cancelForAllUsers=True)
 
         # Remove from the database
         json_object = json.dumps(self.getJson(self.allSpaces), indent=4)
@@ -382,7 +394,7 @@ class Session:
                         startIndex = booking.start.hour - 9
                         endIndex = booking.end.hour - 9
                         for index in range(startIndex, endIndex):
-                            spaceAvailability[index] = "[green]:heavy_check_mark:"
+                            spaceAvailability[index] = " [green]:heavy_check_mark:"
 
                 table.add_row(
                     space.location,
@@ -434,4 +446,5 @@ class Session:
                 return
             elif keyboard.is_pressed('N') or keyboard.is_pressed('n'):
                 time.sleep(0.2)
+                console.clear()
                 return
