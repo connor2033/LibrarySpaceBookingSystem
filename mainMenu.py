@@ -17,6 +17,7 @@ session = None
 def main():
     # title panel + login
 
+    global format
     format = "blink bold white"
     print(Panel("Library Space Management System", style=format))
 
@@ -51,16 +52,17 @@ def main():
             session.viewSpace()
         elif option == "2":
             console.clear()
-            print("View my bookings")
             session.viewUserBookings()
             session.cancelBookingPrompt()
+            console.clear()
         elif option == "3" and session.user.isLibrarian:
             console.clear()
             session.addSpace()
+            console.clear()
         elif option == "4" and session.user.isLibrarian:
             console.clear()
             session.removeSpace()
-        console.clear()
+            console.clear()
         console.print(table)
 
 def login(format):
