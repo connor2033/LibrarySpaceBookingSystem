@@ -4,9 +4,9 @@ from datetime import datetime
 from datetime import timedelta
 
 import session
-from user import User
-from booking import Booking
-from space import Space
+from models.user import User
+from models.booking import Booking
+from models.space import Space
 
 # Returns a test user
 @pytest.fixture
@@ -42,28 +42,28 @@ def test_loadBookings(session_object):
     # patch open since we don't want to actually open the file
     patch_open = patch("builtins.open", MagicMock())
 
-    # provide mock data for tests
+    # bookings are made for future dates since load bookings removes past bookings
     mock_data = MagicMock(return_value = [ 
         {
             "bookingId": 0,
             "spaceId": 2,
             "userEmail": "cdong49@uwo.ca",
-            "startTime": "2022-11-21 14:00:00",
-            "endTime": "2022-11-21 16:00:00"
+            "startTime": "2100-11-21 14:00:00",
+            "endTime": "2100-11-21 16:00:00"
         },
         {
             "bookingId": 1,
             "spaceId": 0,
             "userEmail": "eliu72@uwo.ca",
-            "startTime": "2022-11-21 11:00:00",
-            "endTime": "2022-11-21 13:00:00"
+            "startTime": "2100-11-21 11:00:00",
+            "endTime": "2100-11-21 13:00:00"
         }])
     patch_json_load = patch("json.load", mock_data)
 
     # the expected return value after parsing the json data
     expected_data = {
-        0: Booking(0, 2, "cdong49@uwo.ca", datetime.strptime("2022-11-21 14:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2022-11-21 16:00:00",'%Y-%m-%d %H:%M:%S')),
-        1: Booking(1, 0, "eliu72@uwo.ca", datetime.strptime("2022-11-21 11:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2022-11-21 13:00:00",'%Y-%m-%d %H:%M:%S'))
+        0: Booking(0, 2, "cdong49@uwo.ca", datetime.strptime("2100-11-21 14:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2100-11-21 16:00:00",'%Y-%m-%d %H:%M:%S')),
+        1: Booking(1, 0, "eliu72@uwo.ca", datetime.strptime("2100-11-21 11:00:00",'%Y-%m-%d %H:%M:%S'), datetime.strptime("2100-11-21 13:00:00",'%Y-%m-%d %H:%M:%S'))
     }
 
     # using the mocks, test loadBookings function
@@ -137,7 +137,7 @@ def test_addBooking(session_object):
     # we don't want to actually write to the file so we mock this funciton
     patch_open = patch("builtins.open", MagicMock()) 
     with patch_open as p_open:
-        newBooking = session_object.addBooking("12", datetime.today(), datetime.today()+timedelta(hours=1))
+        newBooking = session_object.addBooking("12", '2022-11-28 09:00:00', '2022-11-28 10:00:00')
 
         # check that new booking is in the bookings dict
         assert newBooking == session_object.allBookings[newBooking.bookingId]
@@ -152,7 +152,7 @@ def test_cancelBooking(session_object):
     patch_open = patch("builtins.open", MagicMock())
     with patch_open as p_open:
         # add a fake booking and try to remove it
-        newBooking = session_object.addBooking("13", datetime.today(), datetime.today()+timedelta(hours=1))
+        newBooking = session_object.addBooking("13", '2022-11-28 11:00:00', '2022-11-28 12:00:00')
         newBookingId = newBooking.bookingId
         
         # remove the new booking
@@ -171,8 +171,10 @@ def test_addSpace(session_object):
     patch_open = patch("builtins.open", MagicMock()) 
     with patch_open as p_open:
         newSpace = session_object.addSpace("Fake location", 10)
+
         # check that new space is in the spaces dict
         assert newSpace == session_object.allSpaces[newSpace.spaceId]
+        
         # check that we tried to add to database
         p_open.assert_called_once()
 
@@ -181,16 +183,15 @@ def test_addSpace(session_object):
 def test_removeSpace(session_object):
     # we don't want to actually write to the file so we mock this funciton
     patch_open = patch("builtins.open", MagicMock())
+    patch_cancelBooking = patch("session.Session.cancelBooking")
     with patch_open as p_open:
-        # add a fake space and try to remove it
-        newSpace = session_object.addSpace("Fake location", 222)
-        newSpaceId = newSpace.spaceId
-        
-        # remove the new space
-        session_object.removeSpace(newSpaceId)
+        with patch_cancelBooking:
+            # remove a space
+            spaceId = 0
+            session_object.removeSpace(spaceId)
 
-        # check that the space is no longer in the dict
-        assert newSpaceId not in session_object.allSpaces
+            # check that the space is no longer in the dict
+            assert spaceId not in session_object.allSpaces
 
-        # check that changes are saved to db
-        assert p_open.call_count == 2 # 1 call for addSpace, 1 call for removeSpace
+            # check that changes are saved to db
+            p_open.assert_called_once()

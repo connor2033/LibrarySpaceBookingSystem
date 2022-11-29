@@ -1,5 +1,19 @@
 [
   {
+    "email": "student@uwo.ca",
+    "password": "student",
+    "isLibrarian": false,
+    "firstName": "Albert",
+    "lastName": "Einstein"
+  },
+  {
+    "email": "librarian@uwo.ca",
+    "password": "librarian",
+    "isLibrarian": true,
+    "firstName": "Ahmed",
+    "lastName": "Ibrahim"
+  },
+  {
     "email": "chaines4@uwo.ca",
     "password": "pwd",
     "isLibrarian": true,
