@@ -142,9 +142,6 @@ def test_addBooking(session_object):
         # check that new booking is in the bookings dict
         assert newBooking == session_object.allBookings[newBooking.bookingId]
 
-        # check that new booking is added to user bookings
-        assert newBooking in session_object.userBookings
-
         # check that we tried to add to database
         p_open.assert_called_once()
 
@@ -162,7 +159,6 @@ def test_cancelBooking(session_object):
         session_object.cancelBooking(newBookingId)
 
         # check that the booking is no longer in the dict
-        assert newBooking not in session_object.userBookings
         assert newBookingId not in session_object.allBookings
 
         # check that changes are saved to db
