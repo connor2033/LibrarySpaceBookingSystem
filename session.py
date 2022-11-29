@@ -196,20 +196,37 @@ class Session:
         console.print("Please enter the booking id you would like to cancel: ", style=format)
         bookingId = int(input())
 
-        self.cancelBooking(bookingId)
+        if self.cancelBooking(bookingId) is False:
+            console.print("Invalid booking ID", style=format)
+            self.cancelBookingPrompt()
+        else:
+            console.print("Booking " + str(bookingId) + " successfully cancelled.\n")
         
 
     def cancelBooking(self, bookingId):
         """
         Iterate through user bookings and remove the specified booking
         """
-        # Delete the booking from the all bookings dictionary
-        del self.allBookings[bookingId]
+        bookingExists = False
+        for booking in self.getUserBookings():
+            if bookingId == booking.bookingId:
+                bookingExists = True
 
-        # Update the database
-        json_object = json.dumps(self.getJson(self.allBookings), indent=4)
-        with open(self.bookings_filename, "w") as f:
-            f.write(json_object)
+        if bookingExists:
+            # Delete the booking from the all bookings dictionary
+            del self.allBookings[bookingId]
+
+            # Update the database
+            json_object = json.dumps(self.getJson(self.allBookings), indent=4)
+            with open(self.bookings_filename, "w") as f:
+                f.write(json_object)
+        
+            # return true if booking was cancelled
+            return True
+        
+        # return false if booking not found in user bookings
+        else:
+            return False
 
     def addSpace(self, location, seats, outlets=False, accessible=False, quiet=False, private=False, media=False):
         # Get the next space ID
