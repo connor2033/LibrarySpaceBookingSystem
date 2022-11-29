@@ -8,7 +8,6 @@ from rich.prompt import Prompt
 from booking import Booking
 from space import Space
 from datetime import datetime
-import keyboard
 import time
 
 class Session:
@@ -44,7 +43,7 @@ class Session:
             bookings[booking['bookingId']] = newBooking
 
         f.close()
-        
+
         # update bookings in the database to include only future bookings
         json_object = json.dumps(self.getJson(bookings), indent=4)
         with open(self.bookings_filename, "w") as f:
@@ -100,12 +99,12 @@ class Session:
         for i in range(7):
             currDate = date.today() + timedelta(days=i)
             dates.update({i:str(currDate)})
-        
+
         bookDate = dates[dayInt]
-        console.print("Booking space for "+(date.today() + timedelta(days=dayInt)).strftime("%B %d, %Y"))
+        console.print("Booking space for "+(date.today() + timedelta(days=dayInt)).strftime("%B %d, %Y"), style=format)
 
         # prompt to select filters
-        console.print("Would you like to view a space that:")
+        console.print("Would you like to view a space that:",style=format)
         outlets = Prompt.ask("Has outlets", choices=["True", "False"])
         media = Prompt.ask("Has media? i.e. tv", choices=["True", "False"])
         accessible = Prompt.ask("Is accessible?", choices=["True", "False"])
@@ -127,8 +126,6 @@ class Session:
         spaceTable.add_column("Option", justify="right", style="cyan", no_wrap=True)
         spaceTable.add_column("Table", style="white")
         for spaceId, space in self.allSpaces.items():
-            # console.print(pref)
-            # console.print(space.filters)
             spaceHasFilters = True
             for filterId, filterValue in space.filters.items():
                 # we only want to keep spaces where the filter preferences match or if the preference does not matter to user
@@ -142,7 +139,7 @@ class Session:
             console.print(spaceTable)
             spaceId = input()
         else:
-            console.print("There are no spaces available with your selected preferences")
+            console.print("There are no spaces available with your selected preferences",style=format)
             return
 
         # prompt to select time and duration of booking
@@ -152,30 +149,30 @@ class Session:
             if (not self.user.isLibrarian):
                 duration = Prompt.ask("Would you like to book this space for 1 or 2 hours?", choices=["1", "2"])
             else:
-                console.print("How many hours would you like to book this space for?")
+                console.print("How many hours would you like to book this space for?",style=format)
                 duration = input()
-            
+
             if "am" in bookTime or bookTime[:-2] == "12":
-                if (int(bookTime[:-2]) + int(duration)) % 12 <= 9:
+                if (int(bookTime[:-2]) + int(duration)) <= 21:
                     durationApproved = True
                     bookTime = int(bookTime[:-2])
                 else:
                     console.clear()
-                    console.print("[red]Invalid duration.")
+                    console.print("[red]Invalid duration.",style=format)
             else:
                 if int(bookTime[:-2]) + int(duration) <= 9:
                     durationApproved = True
                     bookTime = int(bookTime[:-2]) + 12
                 else:
                     console.clear()
-                    console.print("Invalid duration.")
+                    console.print("[red]Invalid duration.",format=format)
 
-            
+
         endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
         startTime = bookDate + " " + str(bookTime) + ":00:00"
 
-        if self.addBooking(spaceId, bookDate, endTime) is False:
-            console.print("There are no spaces available with that date and time. Please check the available spaces again.")
+        if self.addBooking(spaceId, startTime, endTime) == False:
+            console.print("This space is not available for that date and time. Please check the available spaces again.",style=format)
             return
 
         # Confirm booking
@@ -227,7 +224,7 @@ class Session:
         if action == 1:
             console.clear()
             return
-        
+
         console.print("Please enter the booking id you would like to cancel: ", style=format)
         bookingId = int(input())
 
@@ -235,8 +232,8 @@ class Session:
             console.print("Invalid booking ID", style=format)
             self.cancelBookingPrompt()
         else:
-            console.print("Booking " + str(bookingId) + " successfully cancelled.\n")
-        
+            console.print("Booking " + str(bookingId) + " successfully cancelled.\n",style=format)
+
 
     def cancelBooking(self, bookingId, cancelForAllUsers=False):
         """
@@ -255,31 +252,31 @@ class Session:
             json_object = json.dumps(self.getJson(self.allBookings), indent=4)
             with open(self.bookings_filename, "w") as f:
                 f.write(json_object)
-        
+
             # return true if booking was cancelled
             return True
-        
+
         # return false if booking not found in user bookings
         else:
             return False
 
     def addSpace(self):
         console = Console()
-        
-        console.print("Adding a Study Space, Please answer the following:")
-        
+
+        console.print("Adding a Study Space, Please answer the following:",style=format)
+
         # Prompt to input filters
-        console.print("Please enter the location name (ex. Taylor - Room 155)")
+        console.print("Please enter the location name (ex. Taylor - Room 155)",style=format)
         spaceName = input()
         outlets = Prompt.ask("Has outlets", choices=["True", "False"])
         media = Prompt.ask("Has media? i.e. tv", choices=["True", "False"])
         accessible = Prompt.ask("Is accessible?", choices=["True", "False"])
         quiet = Prompt.ask("Is a quiet zone?", choices=["True", "False"])
         closed = Prompt.ask("Is a closed space?", choices=["True", "False"])
-        console.print("What are the minimum number of seats available?")
+        console.print("What are the minimum number of seats available?",style=format)
         minSeats = input()
 
-        # Finding new unique key to add to the space json file 
+        # Finding new unique key to add to the space json file
         nextSpace = max(self.allSpaces.keys()) + 1
 
         # Build filters dictionary
@@ -310,11 +307,12 @@ class Session:
         print(spaceName + " has been added to the system")
 
         return newSpace
-        
+
 
     def removeSpace(self):
         console = Console()
-        
+        format = "blink bold white"
+
         allSpacesTable = Table(title="All Study Spaces", show_lines=True)
         allSpacesTable.add_column("Space ID", justify="center", style="cyan", no_wrap=True)
         allSpacesTable.add_column("Location", justify="center", style="cyan", no_wrap=True)
@@ -325,12 +323,12 @@ class Session:
         console.print(allSpacesTable)
 
         # Prompt to ask which space ID to remove
-        console.print("What is the Space ID you would like to remove?")
+        console.print("What is the Space ID you would like to remove?",style=format)
         spaceId = input()
 
         # Delete space from system
         del self.allSpaces[int(spaceId)]
-        print("Space Id " + spaceId + " has been removed from the System")
+        console.print("Space Id " + spaceId + " has been removed from the System",style=format)
 
         tempSpaces = self.allBookings.copy()
         for bookingId, booking in tempSpaces.items():
@@ -341,7 +339,7 @@ class Session:
         json_object = json.dumps(self.getJson(self.allSpaces), indent=4)
         with open(self.spaces_filename, "w") as f:
             f.write(json_object)
-        
+
 
     def getJson(self, dictionary):
         """
@@ -374,7 +372,7 @@ class Session:
         for booking in userBookings:
             location = self.allSpaces[booking.spaceId].location
             table.add_row(str(booking.bookingId), location, str(booking.start), str(booking.end))
-        
+
         # clear console and display the table
         console.clear()
         console.print(table)
@@ -410,6 +408,8 @@ class Session:
                 hour = i + 9
                 if hour > 12:
                     hour = str(hour % 12) + "pm"
+                elif hour == 12:
+                    hour = str(12) + "pm"
                 else:
                     hour = str(hour) + "am"
                 table.add_column(hour, style="white")
@@ -441,38 +441,38 @@ class Session:
                 )
 
             tables.append(table)
-            # console.print(table)
 
         curr = 0
         refresh = True
         viewing = True
         while viewing:
-            
+
             if refresh:
                 console.clear()
                 console.print(tables[curr])
                 refresh = False
 
-                console.print("Press < > to cycle through tables", style=format)
+                console.print("Enter < to go back and > to go forward", style=format)
                 # Ask if user wants to book
-                console.print("Would you like to book a space? Please enter Y for yes or N for no", style=format)
+                res = console.print("Would you like to book a space? Please enter Y for yes or N for no", style=format)
+                res = input()
 
-            if keyboard.is_pressed('right'):
+            if (res == '>' or res == '.'):
                 time.sleep(0.2)
                 if curr < 6:
                     curr = curr+1
                     refresh = True
-            elif keyboard.is_pressed('left'):
+            elif (res == '<' or res == ','):
                 time.sleep(0.2)
                 if curr > 0:
                     curr = curr-1
                     refresh = True
-            elif keyboard.is_pressed('Y') or keyboard.is_pressed('y'):
+            elif (res == 'Y') or (res == 'y'):
                 time.sleep(0.5)
                 console.clear()
                 self.addBookingPrompt(curr)
                 return
-            elif keyboard.is_pressed('N') or keyboard.is_pressed('n'):
+            elif (res == 'N') or (res == 'n'):
                 time.sleep(0.2)
                 console.clear()
                 return
