@@ -53,7 +53,7 @@
         "seats": 6,
         "filters": {
             "outlets": true,
-            "accesible": true,
+            "accessible": true,
             "quiet": true,
             "private": true,
             "media": true
@@ -65,7 +65,7 @@
         "seats": 7,
         "filters": {
             "outlets": true,
-            "accesible": true,
+            "accessible": true,
             "quiet": true,
             "private": false,
             "media": true
