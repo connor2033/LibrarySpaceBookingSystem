@@ -46,5 +46,29 @@
             "private": true,
             "media": true
         }
+    },
+    {
+        "spaceId": 4,
+        "location": "Test room 123",
+        "seats": 6,
+        "filters": {
+            "outlets": true,
+            "accesible": true,
+            "quiet": true,
+            "private": true,
+            "media": true
+        }
+    },
+    {
+        "spaceId": 5,
+        "location": "Test Room #2",
+        "seats": 7,
+        "filters": {
+            "outlets": true,
+            "accesible": true,
+            "quiet": true,
+            "private": false,
+            "media": true
+        }
     }
 ]

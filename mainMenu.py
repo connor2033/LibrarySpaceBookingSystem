@@ -58,10 +58,10 @@ def main():
             # Option to cancel booking here
         elif option == "3" and session.user.isLibrarian:
             console.clear()
-            print("Add a study space")
+            session.addSpace()
         elif option == "4" and session.user.isLibrarian:
             console.clear()
-            print("Remove a study space")
+            session.removeSpace()
         console.print(table)
 
 def login(format):
