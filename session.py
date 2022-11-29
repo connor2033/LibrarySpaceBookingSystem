@@ -31,6 +31,11 @@ class Session:
 
         bookings = {}
         for booking in data:
+            # we don't want to load bookings that are past
+            bookingEndTime = datetime.strptime(booking['endTime'], '%Y-%m-%d %H:%M:%S')
+            if bookingEndTime < datetime.now():
+                continue
+            # if the booking is in the future, append to our list
             newBooking = Booking(
                 bookingId = booking['bookingId'],
                 spaceId = booking['spaceId'],
@@ -41,6 +46,12 @@ class Session:
             bookings[booking['bookingId']] = newBooking
 
         f.close()
+        
+        # update bookings in the database to include only future bookings
+        json_object = json.dumps(self.getJson(bookings), indent=4)
+        with open(self.bookings_filename, "w") as f:
+            f.write(json_object)
+
         return bookings
 
     def loadSpaces(self):
