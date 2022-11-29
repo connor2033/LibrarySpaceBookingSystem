@@ -80,7 +80,7 @@ class Session:
         """
         return self.userBookings
 
-    def addBooking(self):
+    def addBooking(self, dayInt):
         """
         Add a new booking to the system
         """
@@ -88,22 +88,13 @@ class Session:
         console = Console()
         format = "blink bold white"
 
-        # table with day options
-        table = Table(title="Days Available")
-        table.add_column("Option", justify="right", style="cyan", no_wrap=True)
-        table.add_column("Action", style="magenta")
-        option = ""
         dates = {}
         for i in range(7):
             currDate = date.today() + timedelta(days=i)
-            dates.update({str(i):str(currDate)})
-            table.add_row(str(i),currDate.strftime("%B %d, %Y"))
-
-        # request date of booking
-        console.print("What day would you like to book for? Please enter the option:", style=format)
-        console.print(table)
-        option = input()
-        bookDate = dates[option]
+            dates.update({i:str(currDate)})
+        
+        bookDate = dates[dayInt]
+        console.print("Booking space for "+(date.today() + timedelta(days=dayInt)).strftime("%B %d, %Y"))
 
         # prompt to select filters
         console.print("Would you like to view a space that:")
@@ -144,18 +135,30 @@ class Session:
             return
 
         # prompt to select time and duration of booking
-        bookTime = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm"])
-        if (not self.user.isLibrarian):
-            duration = Prompt.ask("Would you like to book this space for 1 or 2 hours?", choices=["1", "2"])
-        else:
-            console.print("How many hours would you like to book this space for?")
-            duration = input()
+        bookTime = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm"])
+        durationApproved = False
+        while not durationApproved:
+            if (not self.user.isLibrarian):
+                duration = Prompt.ask("Would you like to book this space for 1 or 2 hours?", choices=["1", "2"])
+            else:
+                console.print("How many hours would you like to book this space for?")
+                duration = input()
+            
+            if "am" in bookTime or bookTime[:-2] == "12":
+                if (int(bookTime[:-2]) + duration) % 12 <= 9:
+                    durationApproved = True
+                    bookTime = int(bookTime[:-2])
+                else:
+                    console.clear()
+                    console.print("[red]Invalid duration.")
+            else:
+                if int(bookTime[:-2]) + int(duration) <= 9:
+                    durationApproved = True
+                    bookTime = int(bookTime[:-2]) + 12
+                else:
+                    console.clear()
+                    console.print("Invalid duration.")
 
-        # convert booking time to a datetime formatted string
-        if "am" in bookTime:
-            bookTime = int(bookTime.strip("am"))
-        else:
-            bookTime = int(bookTime.strip("pm"))
             
         endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
         bookDate = bookDate + " " + str(bookTime) + ":00:00"
@@ -270,7 +273,7 @@ class Session:
             table.add_column("Table", justify="right", style="cyan", no_wrap=True)
 
             # create 12 columns for times between 9am - 9pm (library open hours)
-            for i in range(13):
+            for i in range(12):
                 hour = i + 9
                 if hour > 12:
                     hour = str(hour % 12) + "pm"
@@ -334,7 +337,7 @@ class Session:
             elif keyboard.is_pressed('Y') or keyboard.is_pressed('y'):
                 time.sleep(0.5)
                 console.clear()
-                self.addBooking()
+                self.addBooking(curr)
                 return
             elif keyboard.is_pressed('N') or keyboard.is_pressed('n'):
                 time.sleep(0.2)
