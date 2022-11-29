@@ -12,8 +12,16 @@ import re
 import sys
 import json
 from datetime import date, timedelta
+from os import system, name
 
 def main():
+    
+    # for windows
+    if name == 'nt': _ = system('cls')
+ 
+    # for mac and linux(here, os.name is 'posix')
+    else: _ = system('clear')
+
     global console, format
     console = Console()
     console.clear()
@@ -212,7 +220,7 @@ def addBookingPrompt(dayInt):
     startTime = bookDate + " " + str(bookTime) + ":00:00"
 
     if session.addBooking(spaceId, startTime, endTime) == False:
-        console.print("This space is not available for that date and time. Please check the available spaces again.",style=format)
+        console.print("This space is not available for that date and time. Or the time chosen is in the past. Please check the available spaces again.",style=format)
         return
 
     console.clear()
