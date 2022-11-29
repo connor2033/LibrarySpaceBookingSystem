@@ -29,6 +29,11 @@ class Session:
 
         bookings = {}
         for booking in data:
+            # we don't want to load bookings that are past
+            bookingEndTime = datetime.strptime(booking['endTime'], '%Y-%m-%d %H:%M:%S')
+            if bookingEndTime < datetime.now():
+                continue
+            # if the booking is in the future, append to our list
             newBooking = Booking(
                 bookingId = booking['bookingId'],
                 spaceId = booking['spaceId'],
@@ -39,6 +44,12 @@ class Session:
             bookings[booking['bookingId']] = newBooking
 
         f.close()
+        
+        # update bookings in the database to include only future bookings
+        json_object = json.dumps(self.getJson(bookings), indent=4)
+        with open(self.bookings_filename, "w") as f:
+            f.write(json_object)
+
         return bookings
 
     def loadSpaces(self):
@@ -118,7 +129,12 @@ class Session:
         for spaceId, space in self.allSpaces.items():
             # console.print(pref)
             # console.print(space.filters)
-            if (space.filters == pref) and (space.seats >= int(minSeats)):
+            spaceHasFilters = True
+            for filterId, filterValue in space.filters.items():
+                # we only want to keep spaces where the filter preferences match or if the preference does not matter to user
+                if not (pref[filterId] == filterValue or pref[filterId] is False):
+                    spaceHasFilters = False
+            if (spaceHasFilters) and (space.seats >= int(minSeats)):
                 results = True
                 spaceTable.add_row(str(spaceId), str(space.location))
         if results:
@@ -126,9 +142,7 @@ class Session:
             console.print(spaceTable)
             spaceId = input()
         else:
-            console.print("There are no spaces booked on your selected preferences")
-            # Time delay
-            # console.clear()
+            console.print("There are no spaces available with your selected preferences")
             return
 
         # prompt to select time and duration of booking
@@ -160,13 +174,27 @@ class Session:
         endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
         startTime = bookDate + " " + str(bookTime) + ":00:00"
 
-        self.addBooking(spaceId, startTime, endTime)
+        if self.addBooking(spaceId, bookDate, endTime) is False:
+            console.print("There are no spaces available with that date and time. Please check the available spaces again.")
+            return
 
         # Confirm booking
         console.print("Your booking is confirmed for: " + startTime, style=format)
 
 
     def addBooking(self, spaceId, startTime, endTime):
+        # verify that there isn't already a booking with the specified start time
+        for booking in self.allBookings.values():
+            # case 1: an existing booking is nested inside the chosen time
+            if booking.start >= datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S') and booking.end <= datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S'):
+                return False
+            # case 2: start time is nested inside an existing booking time
+            if datetime.strptime(startTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S') <= booking.end:
+                return False
+            # case 3: end time is nested inside an existing booking time
+            if datetime.strptime(endTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S') >= booking.end:
+                return False
+
         # Get the next booking id
         nextBookingId = max(self.allBookings.keys()) + 1
 
