@@ -179,17 +179,50 @@ class Session:
         console.print("Your booking is confirmed for: " + startTime, style=format)
 
 
-    def addBooking(self, spaceId, startTime, endTime):
-        # verify that there isn't already a booking with the specified start time
+    def getBookingsPerSpace(self, spaceId):
+        """
+        Helper function to retrieve all the bookings for a certain space
+        """
+        bookings = []
         for booking in self.allBookings.values():
+            if booking.spaceId == spaceId:
+                bookings.append(booking)
+        return bookings
+    
+    def getBookingsPerDay(self):
+        """
+        Retrieve all the bookings corresponding to the next 7 days
+        """ 
+        bookingsPerDay = {}
+        currDate = date.today()
+        for i in range(7):
+            currDate = date.today() + timedelta(days=i)
+            bookingsPerDay[currDate] = [] # create an empty list to store the list of bookings for the day
+
+        # add all bookings for that day into a list
+        for booking in self.allBookings.values():
+            if booking.start.date() in bookingsPerDay:
+                bookingsPerDay[booking.start.date()].append(booking)
+                
+        return bookingsPerDay
+
+    def addBooking(self, spaceId, startTime, endTime):
+        """
+        Checks if booking time does not overlap with an existing booking, then adds it to the database
+        """
+        # verify that there isn't already a booking with the specified start time
+        for booking in self.getBookingsPerSpace(spaceId):
             # case 1: an existing booking is nested inside the chosen time
             if booking.start >= datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S') and booking.end <= datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S'):
+                print(booking.start, booking.end)
                 return False
             # case 2: start time is nested inside an existing booking time
             if datetime.strptime(startTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S') <= booking.end:
+                print("case 2")
                 return False
             # case 3: end time is nested inside an existing booking time
             if datetime.strptime(endTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S') >= booking.end:
+                print("case 3")
                 return False
 
         # Get the next booking id
@@ -383,18 +416,7 @@ class Session:
         console = Console()
         format = "blink bold white"
 
-        # TODO: can move this into a separate function
-        # retrieve all the bookings corresponding to the next 7 days
-        bookingsPerDay = {}
-        currDate = date.today()
-        for i in range(7):
-            currDate = date.today() + timedelta(days=i)
-            bookingsPerDay[currDate] = [] # create an empty list to store the list of bookings for the day
-        # add all bookings for that day into a list
-        for booking in self.allBookings.values():
-            if booking.start.date() in bookingsPerDay:
-                bookingsPerDay[booking.start.date()].append(booking)
-
+        bookingsPerDay = self.getBookingsPerDay()
         tables = []
 
         # show weekly availabilities - display one table per day
