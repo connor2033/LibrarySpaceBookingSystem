@@ -177,6 +177,27 @@ class Session:
         return newBooking
 
 
+    def cancelBookingPrompt(self):
+        """
+        Ask user if they would like to cancel a booking
+        """
+        # set up properties and console for rich library and pretty layout
+        console = Console()
+        format = "blink bold white"
+
+        # ask user what they would like to do next
+        console.print("What would you like to do? Enter (1) to return to the Main Menu or (2) to cancel a booking", style=format)
+        action = int(input())
+
+        # return to main menu if input == 1
+        if action == 1:
+            return
+        
+        console.print("Please enter the booking id you would like to cancel: ", style=format)
+        bookingId = int(input())
+
+        self.cancelBooking(bookingId)
+        
 
     def cancelBooking(self, bookingId):
         """
