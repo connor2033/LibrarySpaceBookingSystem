@@ -19,10 +19,10 @@ session = None
 
 def main():
     # title panel + login
-
     format = "blink bold white"
     print(Panel("Library Space Management System", style=format))
 
+    # create a global session object for the current user
     global session
     session = login(format)
 
@@ -44,29 +44,41 @@ def main():
     option = ""
     while not (option == "0"):
         option = input()
+
+        # logout
         if option == "0":
             console.clear()
             print("Goodbye, "+session.user.firstName)
             print("Logging out.")
             sys.exit()
+
+        # view all spaces for the next 7 days
         elif option == "1":
             console.clear()
             session.viewSpace()
+
+        # view all the user's bookings
         elif option == "2":
             console.clear()
             print("View my bookings")
             session.viewUserBookings()
             session.cancelBookingPrompt()
+        
+        # allow librarians to add study spaces
         elif option == "3" and session.user.isLibrarian:
             console.clear()
             print("Add a study space")
+
+        # allow librarians to delete study spaces
         elif option == "4" and session.user.isLibrarian:
             console.clear()
             print("Remove a study space")
         console.print(table)
 
 def login(format):
-
+    """
+    Prompt user for login credentials to start a new session
+    """
     console.print("\nHello! Please login.", style=format)
     emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     valid = False
@@ -83,15 +95,19 @@ def login(format):
         # Get password
         userPassword = getpass("Password: ")
         validCredentials, user = validateUser(userEmail, userPassword)
-
+        
+        # Prompt user again for credentials if invalid
         if not validCredentials:
             console.clear()
             console.print("[red]Invalid Username or Password.", style=format)
             continue
+        
+        # otherwise, create a new session 
         else:
             valid = True
             newSession = Session(user)
 
+    # Greeting message
     console.clear()
     if newSession.user.isLibrarian:
         console.print("[green]Welcome, "+newSession.user.firstName+". You have librarian level permissions.", style=format)

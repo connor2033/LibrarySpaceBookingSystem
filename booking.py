@@ -10,6 +10,9 @@ class Booking:
         self.end = end
 
     def toDict(self):
+        """
+        Converts the object into a dictionary format
+        """
         return {
             "bookingId": self.bookingId,
             "spaceId": self.spaceId,
