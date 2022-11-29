@@ -55,7 +55,8 @@ def main():
         elif option == "2":
             console.clear()
             print("View my bookings")
-            # Option to cancel booking here
+            session.viewUserBookings()
+            session.cancelBookingPrompt()
         elif option == "3" and session.user.isLibrarian:
             console.clear()
             print("Add a study space")

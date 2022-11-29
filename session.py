@@ -21,7 +21,6 @@ class Session:
         self.user = curr_user
         self.allBookings = self.loadBookings()
         self.allSpaces = self.loadSpaces()
-        self.userBookings = self.getUserBookings()
 
     def loadBookings(self):
         """
@@ -80,7 +79,7 @@ class Session:
         """
         return self.userBookings
 
-    def addBooking(self, dayInt):
+    def addBookingPrompt(self, dayInt):
         """
         Add a new booking to the system
         """
@@ -145,7 +144,7 @@ class Session:
                 duration = input()
             
             if "am" in bookTime or bookTime[:-2] == "12":
-                if (int(bookTime[:-2]) + duration) % 12 <= 9:
+                if (int(bookTime[:-2]) + int(duration)) % 12 <= 9:
                     durationApproved = True
                     bookTime = int(bookTime[:-2])
                 else:
@@ -161,13 +160,20 @@ class Session:
 
             
         endTime = bookDate + " " + str(int(bookTime + int(duration))) + ":00:00"
-        bookDate = bookDate + " " + str(bookTime) + ":00:00"
+        startTime = bookDate + " " + str(bookTime) + ":00:00"
 
+        self.addBooking(spaceId, startTime, endTime)
+
+        # Confirm booking
+        console.print("Your booking is confirmed for: " + startTime, style=format)
+
+
+    def addBooking(self, spaceId, startTime, endTime):
         # Get the next booking id
         nextBookingId = max(self.allBookings.keys()) + 1
 
         # Create a new booking
-        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, bookDate, endTime)
+        newBooking = Booking(nextBookingId, int(spaceId), self.user.userId, startTime, endTime)
 
         # Add booking to the system and database
         self.allBookings[nextBookingId] = newBooking
@@ -176,29 +182,43 @@ class Session:
         with open(self.bookings_filename, "w") as f:
             f.write(json_object)
 
-        # Confirm booking
-        console.print("Your booking is confirmed for: " + bookDate, style=format)
-
         return newBooking
 
 
+    def cancelBookingPrompt(self):
+        """
+        Ask user if they would like to cancel a booking
+        """
+        # set up properties and console for rich library and pretty layout
+        console = Console()
+        format = "blink bold white"
+
+        # ask user what they would like to do next
+        console.print("What would you like to do? Enter (1) to return to the Main Menu or (2) to cancel a booking", style=format)
+        action = int(input())
+
+        # return to main menu if input == 1
+        if action == 1:
+            console.clear()
+            return
+        
+        console.print("Please enter the booking id you would like to cancel: ", style=format)
+        bookingId = int(input())
+
+        self.cancelBooking(bookingId)
+        
 
     def cancelBooking(self, bookingId):
         """
         Iterate through user bookings and remove the specified booking
         """
-        for booking in self.userBookings.values():
-            if booking.bookingId == bookingId:
+        # Delete the booking from the all bookings dictionary
+        del self.allBookings[bookingId]
 
-                # Remove the booking from memory
-                del self.userBookings[bookingId]
-                del self.allBookings[bookingId]
-
-                # Update the database
-                json_object = json.dumps(self.getJson(self.allBookings), indent=4)
-                with open(self.bookings_filename, "w") as f:
-                    f.write(json_object)
-                return
+        # Update the database
+        json_object = json.dumps(self.getJson(self.allBookings), indent=4)
+        with open(self.bookings_filename, "w") as f:
+            f.write(json_object)
 
     def addSpace(self, location, seats, outlets=False, accessible=False, quiet=False, private=False, media=False):
         # Get the next space ID
@@ -241,10 +261,40 @@ class Session:
         
 
     def getJson(self, dictionary):
+        """
+        Converts a dictionary of objects (bookings or spaces) to a json parsable format.
+        """
         json = []
         for value in dictionary.values():
             json.append(value.toDict())
         return json
+
+
+
+    def viewUserBookings(self):
+        """
+        Displays all bookings for the current user and asks if they want to cancel a booking
+        """
+        # set up properties and console for rich library and pretty layout
+        console = Console()
+        format = "blink bold white"
+
+        # create a table to display all user bookings
+        table = Table(title="Bookings for " + self.user.firstName + " " + self.user.lastName, show_lines=True)
+        table.add_column("Booking ID", justify="right", style="cyan", no_wrap=True)
+        table.add_column("Location", justify="right", style="cyan", no_wrap=True)
+        table.add_column("Start Time", justify="right", style="cyan", no_wrap=True)
+        table.add_column("End Time", justify="right", style="cyan", no_wrap=True)
+
+        # for each booking, create a new row for the booking in the table
+        userBookings = self.getUserBookings()
+        for booking in userBookings:
+            location = self.allSpaces[booking.spaceId].location
+            table.add_row(str(booking.bookingId), location, str(booking.start), str(booking.end))
+        
+        # clear console and display the table
+        console.clear()
+        console.print(table)
 
 
     def viewSpace(self):
@@ -337,10 +387,8 @@ class Session:
             elif keyboard.is_pressed('Y') or keyboard.is_pressed('y'):
                 time.sleep(0.5)
                 console.clear()
-                self.addBooking(curr)
+                self.addBookingPrompt(curr)
                 return
             elif keyboard.is_pressed('N') or keyboard.is_pressed('n'):
                 time.sleep(0.2)
                 return
-
-
