@@ -3,11 +3,9 @@ from datetime import timedelta
 import json
 from rich.table import Table
 from rich.console import Console
-from rich.prompt import Prompt
 from models.booking import Booking
 from models.space import Space
 from datetime import datetime
-import time
 
 class Session:
 
