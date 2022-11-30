@@ -1,5 +1,17 @@
 # LibrarySpaceBookingSystem
 
+## [RUN] WITH DOCKER
+
+1. Build image with
+
+  `docker build -t "libmanagesystem:Dockerfile" .`
+
+2. Run image inside of a container using
+
+  `docker run -it libmanagesystem:Dockerfile`
+
+## [RUN] LOCALLY
+
 To install all needed requirements:
 
 1. Ensure you have python3 installed.

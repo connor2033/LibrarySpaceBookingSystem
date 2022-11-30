@@ -77,21 +77,21 @@ class Session:
             if booking.userId == self.user.userId:
                 userBookings.append(booking)
         return userBookings
-        
+
     def getBookingsPerSpace(self, spaceId):
         """
         Helper function to retrieve all the bookings for a certain space
         """
         bookings = []
         for booking in self.allBookings.values():
-            if booking.spaceId == spaceId:
+            if booking.spaceId == int(spaceId):
                 bookings.append(booking)
         return bookings
-    
+
     def getBookingsPerDay(self):
         """
         Retrieve all the bookings corresponding to the next 7 days
-        """ 
+        """
         bookingsPerDay = {}
         currDate = date.today()
         for i in range(7):
