@@ -15,10 +15,10 @@ from datetime import date, timedelta
 from os import system, name
 
 def main():
-    
+
     # for windows
     if name == 'nt': _ = system('cls')
- 
+
     # for mac and linux(here, os.name is 'posix')
     else: _ = system('clear')
 
@@ -46,7 +46,7 @@ def main():
         table.add_row("3","Add a study space")
         table.add_row("4","Remove a study space")
     table.add_row("0","Logout")
-    
+
 
     # loop for user input
     option = ""
@@ -165,8 +165,14 @@ def addBookingPrompt(dayInt):
     # prompt to select from space availabilities
     results = False
     spaceTable = Table(title="Spaces", show_lines=True)
-    spaceTable.add_column("Option", justify="right", style="cyan", no_wrap=True)
-    spaceTable.add_column("Table", style="white")
+    spaceTable.add_column("SpaceId", justify="right", style="cyan", no_wrap=True)
+    spaceTable.add_column("Location", style="white")
+    spaceTable.add_column("Seats", style="white", justify="center")
+    spaceTable.add_column("Outlets", style="white")
+    spaceTable.add_column("Accessible", style="white")
+    spaceTable.add_column("Quiet", style="white")
+    spaceTable.add_column("Closed Space", style="white")
+    spaceTable.add_column("Media", style="white")
 
     spaceIds = []
     for spaceId, space in session.allSpaces.items():
@@ -177,20 +183,20 @@ def addBookingPrompt(dayInt):
                 spaceHasFilters = False
         if (spaceHasFilters) and (space.seats >= int(minSeats)):
             results = True
-            spaceTable.add_row(str(spaceId), str(space.location))
+            spaceTable.add_row(str(spaceId), str(space.location), str(space.seats), str(space.filters["outlets"]), str(space.filters["accessible"]), str(space.filters["quiet"]), str(space.filters["private"]), str(space.filters["media"]))
             spaceIds.append(str(spaceId))
 
+    console.clear()
     if results:
         console.print(spaceTable)
         spaceId = Prompt.ask("What space would you like to book?:", choices=spaceIds)
     else:
-        console.clear()
         console.print("There are no spaces available with your selected preferences",style=format)
         return
-    
+
      # prompt to select time and duration of booking
     bookTime = Prompt.ask("What time would you like to book for?", choices=["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm"])
-    
+
     # Logic to check if duration extends booking past 9pm
     durationApproved = False
     while not durationApproved:
@@ -220,6 +226,7 @@ def addBookingPrompt(dayInt):
     startTime = bookDate + " " + str(bookTime) + ":00:00"
 
     if session.addBooking(spaceId, startTime, endTime) == False:
+        console.clear()
         console.print("This space is not available for that date and time. Or the time chosen is in the past. Please check the available spaces again.",style=format)
         return
 
@@ -291,7 +298,7 @@ def viewSpaces():
             # Ask if user wants to book
             res = console.print("Enter (1) to book a space on this day or (2) to return to the Main Menu", style=format)
             console.print("Enter (<) to go back and (>) to go forward", style=format)
-        
+
         res = input()
 
         if (res == '>' or res == '.'):
@@ -354,12 +361,12 @@ def addSpacePrompt():
     minSeats = input()
 
     # add space to database
-    session.addSpace(spaceName, 
-                    minSeats, 
-                    "True" if outlets == "y" else "False", 
-                    "True" if media == "y" else "False", 
-                    "True" if accessible == "y" else "False", 
-                    "True" if quiet == "y" else "False", 
+    session.addSpace(spaceName,
+                    minSeats,
+                    "True" if outlets == "y" else "False",
+                    "True" if media == "y" else "False",
+                    "True" if accessible == "y" else "False",
+                    "True" if quiet == "y" else "False",
                     "True" if closed == "y" else "False"
                     )
     console.clear()

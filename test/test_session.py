@@ -137,7 +137,7 @@ def test_addBooking(session_object):
     # we don't want to actually write to the file so we mock this funciton
     patch_open = patch("builtins.open", MagicMock()) 
     with patch_open as p_open:
-        newBooking = session_object.addBooking("12", '2022-11-28 09:00:00', '2022-11-28 10:00:00')
+        newBooking = session_object.addBooking("12", '2023-11-28 09:00:00', '2023-11-28 10:00:00')
 
         # check that new booking is in the bookings dict
         assert newBooking == session_object.allBookings[newBooking.bookingId]
@@ -152,7 +152,7 @@ def test_cancelBooking(session_object):
     patch_open = patch("builtins.open", MagicMock())
     with patch_open as p_open:
         # add a fake booking and try to remove it
-        newBooking = session_object.addBooking("13", '2022-11-28 11:00:00', '2022-11-28 12:00:00')
+        newBooking = session_object.addBooking("13", '2023-11-28 11:00:00', '2023-11-28 12:00:00')
         newBookingId = newBooking.bookingId
         
         # remove the new booking
