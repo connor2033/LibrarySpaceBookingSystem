@@ -117,15 +117,12 @@ class Session:
         for booking in self.getBookingsPerSpace(spaceId):
             # case 1: an existing booking is nested inside the chosen time
             if booking.start >= datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S') and booking.end <= datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S'):
-                print(booking.start, booking.end)
                 return False
             # case 2: start time is nested inside an existing booking time
             if datetime.strptime(startTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(startTime, '%Y-%m-%d %H:%M:%S') <= booking.end:
-                print("case 2")
                 return False
             # case 3: end time is nested inside an existing booking time
-            if datetime.strptime(endTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S') >= booking.end:
-                print("case 3")
+            if datetime.strptime(endTime,'%Y-%m-%d %H:%M:%S') >= booking.start and datetime.strptime(endTime, '%Y-%m-%d %H:%M:%S') <= booking.end:
                 return False
 
         # Get the next booking id
