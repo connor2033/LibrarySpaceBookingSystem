@@ -189,7 +189,7 @@ def addBookingPrompt(dayInt):
     console.clear()
     if results:
         console.print(spaceTable)
-        spaceId = Prompt.ask("What space would you like to book?:", choices=spaceIds)
+        spaceId = Prompt.ask("Which space would you like to book?", choices=spaceIds)
     else:
         console.print("There are no spaces available with your selected preferences",style=format)
         return
