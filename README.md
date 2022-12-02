@@ -4,17 +4,17 @@
 
 - Find user login credentials for students and librarians in [storage/users.json]
 
-## [Run] WITH DOCKER
+## [RUN] WITH DOCKER
 
 1.  Run Docker Desktop
 
-2.  Build image with:
+2.  Pull Docker image with the following command:
 
-    > `docker build -t "libmanagesystem:Dockerfile" .`
+    > `docker pull hudamukhtar1/libspacemanagementsystem:Dockerfile`
 
 3.  Run image inside of a container using:
 
-    > `docker run -v ~storage:/storage -it libmanagesystem:Dockerfile`
+    > `docker run -v storage:/storage -it hudamukhtar1/libspacemanagementsystem:Dockerfile`
 
 **Note:** Since this is a local applicaiton, all data is saved _with_ the image. If a new image is created, the data will _not_ carry over.
 
