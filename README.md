@@ -1,24 +1,43 @@
 # LibrarySpaceBookingSystem
 
-## CREDENTIALS
+## [Run] APPLICATION WITH DOCKER
+
+1. Run Docker Desktop
+
+- Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
+
+2. Pull the Docker image:
+    
+    > `docker pull hudamukhtar1/libspacemanagementsystem:latest`
+
+3. Run application:
+
+    > `docker run -v storage:/storage -it libspacemanagementsystem:latest`
+
+### Using the application
 
 - Find user login credentials for students and librarians in [storage/users.json]
+- Expired bookings are automatically cleared when the application is started up
+- We've added additional bookings for the month of December to ensure there is test data available for marking
 
-## [Run] WITH DOCKER
+
+## [Build] WITH DOCKER
 
 1.  Run Docker Desktop
 
+- Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
+
 2.  Build image with:
 
-    > `docker build -t "libmanagesystem:Dockerfile" .`
+    > `docker build -t "libspacemanagementsystem:latest" .`
 
 3.  Run image inside of a container using:
 
-    > `docker run -v ~storage:/storage -it libmanagesystem:Dockerfile`
+    > `docker run -v storage:/storage -it libspacemanagementsystem:latest`
 
-**Note:** Since this is a local applicaiton, all data is saved _with_ the image. If a new image is created, the data will _not_ carry over.
+**Note:** Since this is a local application, all data is saved _with_ the image. If a new image is created, the data will _not_ carry over.
 
-## [RUN] LOCALLY
+## [RUN] SOURCE CODE LOCALLY
 
 To install all needed requirements:
 
@@ -41,6 +60,8 @@ To install all needed requirements:
     > `python mainMenu.py`
 
 ## [TESTING] FOR DEVELOPERS:
+
+All test cases are in the 'test' directory. 
 
 - To collect and run all pytests, run the following command in the main directory:
 
