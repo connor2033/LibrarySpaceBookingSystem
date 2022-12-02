@@ -4,7 +4,7 @@
 
 1. Run Docker Desktop
 
--- Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
+    - Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
 
 2. Pull the Docker image:
     
@@ -25,7 +25,7 @@
 
 1.  Run Docker Desktop
 
--- Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
+    - Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
 
 2.  Build image with:
 
