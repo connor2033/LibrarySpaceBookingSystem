@@ -1,4 +1,8 @@
-# LibrarySpaceBookingSystem
+# LibrarySpaceBookingSystem 👩‍💻📚
+
+This terminal application was created for CS 4471 at Western University by Connor Haines, Huda Mukhtar, Elaine Liu, and Calvin Dong.
+
+**Video Demo:** https://www.youtube.com/watch?v=-WtSdmE6s1Y
 
 ## [Run] APPLICATION WITH DOCKER
 
