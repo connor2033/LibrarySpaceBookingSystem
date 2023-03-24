@@ -1,6 +1,6 @@
 # LibrarySpaceBookingSystem 👩‍💻📚
 
-This terminal application was created for CS 4471 at Western University by Connor Haines, Huda Mukhtar, Elaine Liu, and Calvin Dong.
+This terminal application was created for CS 4471 at Western University by Connor Haines, Huda Mukhtar, Elaine Liu, and Calvin Dong. See our [final report](FinalReport.pdf).
 
 **Video Demo:** https://www.youtube.com/watch?v=-WtSdmE6s1Y
 
@@ -8,15 +8,15 @@ This terminal application was created for CS 4471 at Western University by Conno
 
 1. Run Docker Desktop
 
-    - Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
+   - Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/.
 
 2. Pull the Docker image:
-    
-    > `docker pull hudamukhtar1/libspacemanagementsystem:latest`
+
+   > `docker pull hudamukhtar1/libspacemanagementsystem:latest`
 
 3. Run application:
 
-    > `docker run -v storage:/storage -it libspacemanagementsystem:latest`
+   > `docker run -v storage:/storage -it libspacemanagementsystem:latest`
 
 ### Using the application
 
@@ -24,12 +24,11 @@ This terminal application was created for CS 4471 at Western University by Conno
 - Expired bookings are automatically cleared when the application is started up
 - We've added additional bookings for the month of December to ensure there is test data available for marking
 
-
 ## [Build] WITH DOCKER
 
 1.  Run Docker Desktop
 
-    - Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/. 
+    - Docker Desktop can be installed at https://www.docker.com/products/docker-desktop/.
 
 2.  Build image with:
 
@@ -65,7 +64,7 @@ To install all needed requirements:
 
 ## [TESTING] FOR DEVELOPERS:
 
-All test cases are in the 'test' directory. 
+All test cases are in the 'test' directory.
 
 - To collect and run all pytests, run the following command in the main directory:
 
