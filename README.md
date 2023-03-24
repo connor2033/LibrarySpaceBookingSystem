@@ -4,6 +4,8 @@ This terminal application was created for CS 4471 at Western University by Conno
 
 **Video Demo:** https://www.youtube.com/watch?v=-WtSdmE6s1Y
 
+**Update:** An new web version of this system has been created for CS 4474. See the [interactive report](https://mclhtay.github.io/CS4474-Final-Report/).
+
 ## [Run] APPLICATION WITH DOCKER
 
 1. Run Docker Desktop
